@@ -35,21 +35,25 @@ function PrivateRoute({ children, ...rest }) {
   );
 }
 
-function App() {
+export default function App() {
 
+  // Main routing for the application
   return (
     <Router>
-      <Switch>        
-        <Route path="/login">
+      <Switch>
+        <Route exact path="/">
+          <Redirect to="/home" />
+        </Route> 
+        <Route exact path="/login">
           <Login />
         </Route>
-        <Route path="/signup">
+        <Route exact path="/signup">
           <Signup />
         </Route>
-        <Route exact path="/">
+        <Route exact path="/home">
           <Home />
-        </Route>
-        <Route path="/shift">
+        </Route>        
+        <Route exact path="/shift">
           <Shift />
         </Route>     
       </Switch>
@@ -73,5 +77,3 @@ function App() {
       </header>
     </div> */
 }
-
-export default App;

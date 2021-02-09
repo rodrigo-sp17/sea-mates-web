@@ -164,7 +164,7 @@ export default function Shift(props) {
                             color="inherit"
                             aria-label="go back"
                             component={Link}
-                            to=""                            
+                            to="/home"                            
                         >
                             <ArrowBack />
                         </IconButton>

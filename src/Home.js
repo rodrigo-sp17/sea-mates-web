@@ -16,7 +16,7 @@ import { Divider, List, ListItem, ListItemIcon, ListItemText, Button } from '@ma
 import { Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
 
 import Calendar from './Calendar.js';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Link, Route, Switch, Redirect, useRouteMatch } from 'react-router-dom';
 
 
 const drawerWidth = 240;
@@ -82,12 +82,11 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function Home() {
-    // Title
-    // Sidebar
-    // Calendar
-    //import classes from '*.module.css';
     const classes = useStyles();   
     const [open, setOpen] = React.useState(false);
+
+    // Allows use of relative paths for nested contents
+    let { path, url } = useRouteMatch();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -151,7 +150,7 @@ export default function Home() {
                 <List>
                     <ListItem button key="calendar"
                       component={Link}
-                      to="/calendar"
+                      to={path}
                     >
                         <ListItemIcon><CalendarToday /></ListItemIcon>
                         <ListItemText primary="Calendário"/>
@@ -173,14 +172,12 @@ export default function Home() {
             <div className={classes.drawerHeader} />
             <main className={classes.content}>
               <Switch>
-                <Route exact path="/calendar">
-                  <Calendar />                            
-                </Route>
+                <Route exact path={path}>
+                  <Calendar />
+                </Route>                
                 <Route path="/shifts">
-
                 </Route>
                 <Route path="/events">
-
                 </Route>
               </Switch>
             </main>
