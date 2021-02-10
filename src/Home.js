@@ -1,4 +1,4 @@
-import React from 'react';
+import {React, useEffect, useState} from 'react';
 import clsx from 'clsx';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,6 +17,7 @@ import { Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@mate
 
 import Calendar from './Calendar.js';
 import { Link, Route, Switch, Redirect, useRouteMatch } from 'react-router-dom';
+import Shifts from './Shifts.js';
 
 
 const drawerWidth = 240;
@@ -83,10 +84,50 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home() {
     const classes = useStyles();   
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [shifts, setShifts] = useState([]);
 
     // Allows use of relative paths for nested contents
-    let { path, url } = useRouteMatch();
+    let match = useRouteMatch();
+
+    const fetchShifts = () => {
+      fetch("/api/shift", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': sessionStorage.getItem("token")
+        }
+      })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+          setShifts(result);
+        },
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+    }
+
+    useEffect(() => {
+      fetchShifts();
+    }, [shifts]);
+
+
+    // TODO - remove before deployment
+    useEffect(() => {
+      const data1 = [
+        {"shiftId": 1, "unavailabilityStartDate": "2020-x", "unavailabilityEndDate": "2021-x"},
+        {"shiftId": 2, "unavailabilityStartDate": "2021-x", "unavailabilityEndDate": "2022-x"}
+      ];
+      setShifts(data1);
+    }, []);
+    
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -150,20 +191,29 @@ export default function Home() {
                 <List>
                     <ListItem button key="calendar"
                       component={Link}
-                      to={path}
+                      to={`${match.url}/calendar`}
                     >
                         <ListItemIcon><CalendarToday /></ListItemIcon>
                         <ListItemText primary="Calendário"/>
                     </ListItem>
-                    <ListItem button key="shifts">
+                    <ListItem button key="shifts"
+                      component={Link}
+                      to={`${match.url}/shifts`}
+                    >
                         <ListItemIcon><DateRange /></ListItemIcon>
                         <ListItemText primary="Escalas"/>
                     </ListItem>
-                    <ListItem button key="events">
+                    <ListItem button key="events"
+                      component={Link}
+                      to={`${match.url}/events`}
+                    >
                         <ListItemIcon><Event /></ListItemIcon>
                         <ListItemText primary="Eventos"/>
                     </ListItem>
-                    <ListItem button key="friends">
+                    <ListItem button key="friends"
+                      component={Link}
+                      to={`${match.url}/friends`}
+                    >
                         <ListItemIcon><People /></ListItemIcon>
                         <ListItemText primary="Amigos"/>
                     </ListItem>
@@ -172,12 +222,17 @@ export default function Home() {
             <div className={classes.drawerHeader} />
             <main className={classes.content}>
               <Switch>
-                <Route exact path={path}>
+                <Route path={`${match.path}/calendar`}>
                   <Calendar />
                 </Route>                
-                <Route path="/shifts">
+                <Route path={`${match.path}/shifts`}>
+                  <Shifts shifts={shifts} />
                 </Route>
-                <Route path="/events">
+                <Route path={`${match.path}/events`}>
+                  <h3>Events</h3>
+                </Route>
+                <Route exact path={match.path}>
+                  <Redirect to={`${match.path}/calendar`} />
                 </Route>
               </Switch>
             </main>
