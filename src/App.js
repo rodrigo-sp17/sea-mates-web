@@ -50,12 +50,12 @@ export default function App() {
         <Route exact path="/signup">
           <Signup />
         </Route>
-        <Route exact path="/home">
+        <Route path="/home">
           <Home />
         </Route>        
         <Route exact path="/shift">
           <Shift />
-        </Route>     
+        </Route>        
       </Switch>
     </Router>
   );
