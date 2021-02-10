@@ -122,8 +122,19 @@ export default function Home() {
     // TODO - remove before deployment
     useEffect(() => {
       const data1 = [
-        {"shiftId": 1, "unavailabilityStartDate": "2020-x", "unavailabilityEndDate": "2021-x"},
-        {"shiftId": 2, "unavailabilityStartDate": "2021-x", "unavailabilityEndDate": "2022-x"}
+        {
+          "shiftId": 1,
+          "unavailabilityStartDate": new Date(2021, 1, 1),
+          "boardingDate": new Date(2021, 1, 2),
+          "leavingDate": new Date(2021, 1, 8),
+          "unavailabilityEndDate": new Date(2021, 1, 10)},
+        {
+          "shiftId": 2,
+          "unavailabilityStartDate": new Date(2021, 1, 14),
+          "boardingDate": new Date(2021, 1, 15),
+          "leavingDate": new Date(2021, 1, 17),          
+          "unavailabilityEndDate": new Date(2021, 1, 18)
+        }
       ];
       setShifts(data1);
     }, []);
@@ -223,7 +234,7 @@ export default function Home() {
             <main className={classes.content}>
               <Switch>
                 <Route path={`${match.path}/calendar`}>
-                  <Calendar />
+                  <Calendar shifts={shifts}/>
                 </Route>                
                 <Route path={`${match.path}/shifts`}>
                   <Shifts shifts={shifts} />

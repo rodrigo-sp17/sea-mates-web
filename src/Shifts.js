@@ -89,7 +89,7 @@ export default function Shifts(props) {
                                 </Typography>
                             </ListItemAvatar>
                             <ListItemText 
-                                primary={`de ${shift.unavailabilityStartDate} até ${shift.unavailabilityEndDate}`}
+                                primary={`de ${shift.unavailabilityStartDate.toLocaleDateString()} até ${shift.unavailabilityEndDate.toLocaleDateString()}`}
                             />                        
                         </ListItem>
                     ))}
