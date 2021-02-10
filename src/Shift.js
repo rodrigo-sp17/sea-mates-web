@@ -163,8 +163,7 @@ export default function Shift(props) {
                             edge="start"
                             color="inherit"
                             aria-label="go back"
-                            component={Link}
-                            to="/home"                            
+                            onClick={history.goBack}                           
                         >
                             <ArrowBack />
                         </IconButton>
