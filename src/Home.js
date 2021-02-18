@@ -158,7 +158,7 @@ export default function Home() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                        Calendário    
+                      Minha Escala    
                     </Typography>
                     <Button
                       variant="contained"
@@ -226,14 +226,13 @@ export default function Home() {
             <div className={classes.drawerHeader} />
             <main className={classes.content}>
               <Switch>
-                <Route path={`${match.path}/calendar`}>
+                <Route path={`${match.path}/calendar`}>                  
                   <Calendar shifts={shifts}/>
                 </Route>                
                 <Route path={`${match.path}/shifts`}>
                   <Shifts shifts={shifts} fetchShifts={fetchShifts} />
                 </Route>
-                <Route path={`${match.path}/events`}>
-                  <h3>Events</h3>
+                <Route path={`${match.path}/events`}>                  
                 </Route>
                 <Route exact path={match.path}>
                   <Redirect to={`${match.path}/calendar`} />
