@@ -160,14 +160,6 @@ export default function Home() {
                     <Typography variant="h6" className={classes.title}>
                       Minha Escala    
                     </Typography>
-                    <Button
-                      variant="contained"
-                      component={Link}
-                      to="/shift"
-                      startIcon={<Add />}
-                    >
-                      Nova escala
-                    </Button>
                     <IconButton color="inherit" >
                         <Badge badgeContent={0} color="secondary">
                             <NotificationsIcon />

@@ -2,6 +2,9 @@ import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
+import { Fab, Grid } from '@material-ui/core';
+import { Add } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 
 export default function Calendar(props) {
 
@@ -61,14 +64,30 @@ export default function Calendar(props) {
 
 
     return (
-        <FullCalendar
-            plugins={[ dayGridPlugin, interactionPlugin ]}
-            initialView="dayGridMonth"
-            selectable={true}
-            height="auto"
-            contentHeight="auto"
-            locale="pt-br"
-            events={parseEvents(props)}
-        />
+        <Grid container spacing={3}>
+            <Grid item>
+                <FullCalendar
+                    plugins={[ dayGridPlugin, interactionPlugin ]}
+                    initialView="dayGridMonth"
+                    selectable={true}
+                    height="auto"
+                    contentHeight="auto"
+                    locale="pt-br"
+                    events={parseEvents(props)}
+                />
+            </Grid>
+            <Grid container item justify="flex-end">
+                <Fab 
+                    variant="extended"
+                    color="primary" 
+                    aria-label="add"
+                    component={Link}
+                    to="/shift"
+                >
+                    <Add />
+                    Escala
+                </Fab>
+            </Grid>
+        </Grid>
     );
 }
