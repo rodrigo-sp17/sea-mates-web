@@ -133,12 +133,12 @@ export default function Home() {
 
 
     // Drawer handlers
-    const handleDrawerOpen = () => {
-        setOpen(true);
-    }
-
-    const handleDrawerClose = () => {
-        setOpen(false);
+    const toggleDrawer = (open) => (event) => {
+      if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+          return;
+      }
+      
+      setOpen(open);
     }
 
     return (
@@ -152,7 +152,7 @@ export default function Home() {
                         edge="start"
                         color="inherit"
                         aria-label="open menu"
-                        onClick={handleDrawerOpen}
+                        onClick={toggleDrawer(true)}
                         className={clsx(classes.menuButton, open && classes.hide)}
                     >
                         <MenuIcon />
@@ -168,23 +168,25 @@ export default function Home() {
                 </Toolbar>
             </AppBar>
             <Drawer
-                variant="responsive"
+                variant="temporary"
                 anchor="left"
                 open={open}
                 className={classes.drawer}
                 classes={{
                     paper: classes.drawerPaper
                 }}
+                onKeyDown={toggleDrawer(false)}
+                onClick={toggleDrawer(false)}
             >
                 <div className={classes.drawerHeader}>
                     <IconButton
-                        onClick={handleDrawerClose}
+                        onClick={toggleDrawer(false)}
                     >
                         <ChevronLeft />
                     </IconButton>
                 </div>
                 <Divider />
-                <List>
+                <List onClick={toggleDrawer(false)}>
                     <ListItem button key="calendar"
                       component={Link}
                       to={`${match.url}/calendar`}
