@@ -5,19 +5,20 @@ import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClic
 
 export default function Calendar(props) {
 
-    // Event handlers
+    // Handlers
     const handleDayClick = () => {
         // TODO: show event
     }
 
     // Parses Shift objects to FullCalendars's Event objects
+    // Shifts are assumed to always be a Shift array/list
     const parseEvents = (props) => {
         var events = props.shifts.map(shift => {            
             var unavailable = {
                 id: shift.shiftId,
                 title: "Pré-embarque",
-                start: shift.unavailabilityStartDate.toISOString(),
-                end: shift.boardingDate.toISOString(),
+                start: shift.unavailabilityStartDate,
+                end: shift.boardingDate,
                 display: "block",
                 backgroundColor: "rgb(255,92,0)",
                 allDay: "true",
@@ -25,13 +26,12 @@ export default function Calendar(props) {
                     group: shift.shiftId
                 }
             };
-            //console.log(event);
 
             var onBoard = {
                 id: "board" + shift.shiftId,
                 title: "A bordo",
-                start: shift.boardingDate.toISOString(),
-                end: shift.leavingDate.toISOString(),
+                start: shift.boardingDate,
+                end: shift.leavingDate,
                 display: "block",
                 backgroundColor: "rgb(170,0,0)",
                 allDay: "true",
@@ -43,8 +43,8 @@ export default function Calendar(props) {
             var available = {
                 id: "available" + shift.shiftId,
                 title: "Pós-embarque",
-                start: shift.leavingDate.toISOString(),
-                end: shift.unavailabilityEndDate.toISOString(),
+                start: shift.leavingDate,
+                end: shift.unavailabilityEndDate,
                 display: "block",
                 backgroundColor: "rgb(0,185,185)",
                 allDay: "true",

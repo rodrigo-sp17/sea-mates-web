@@ -16,7 +16,7 @@ import { Divider, List, ListItem, ListItemIcon, ListItemText, Button } from '@ma
 import { Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
 
 import Calendar from './Calendar.js';
-import { Link, Route, Switch, Redirect, useRouteMatch } from 'react-router-dom';
+import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
 import Shifts from './Shifts.js';
 
 
@@ -83,63 +83,56 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function Home() {
-    const classes = useStyles();   
-    const [open, setOpen] = useState(false);
-
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [shifts, setShifts] = useState([]);
-
+    const classes = useStyles();
+    const history = useHistory();
     // Allows use of relative paths for nested contents
     let match = useRouteMatch();
+    
+    // Drawer state
+    const [open, setOpen] = useState(false);
+
+    // Shifts state
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [shifts, setShifts] = useState([]);
 
     const fetchShifts = () => {
       fetch("/api/shift", {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8',
+        headers: {          
           'Authorization': sessionStorage.getItem("token")
+        }
+      })
+      .then(res => {
+        if (res.status === 403) {
+          history.push("/login");
+          setShifts([]);
+          return;
+        } else if (res.ok) {
+          return res;
+        } else {
+          console.log("Unexpected response status: " + res.status);  
         }
       })
       .then(res => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
-          setShifts(result);
+          setShifts(result._embedded.shiftList);
         },
         (error) => {
           setIsLoaded(true);
-          setError(error);
+          console.log(error);
+          setShifts([]);
         }
-      )
+      );
     }
 
     useEffect(() => {
       fetchShifts();
-    }, [shifts]);
-
-
-    // TODO - remove before deployment
-    useEffect(() => {
-      const data1 = [
-        {
-          "shiftId": 1,
-          "unavailabilityStartDate": new Date(2021, 1, 1),
-          "boardingDate": new Date(2021, 1, 2),
-          "leavingDate": new Date(2021, 1, 8),
-          "unavailabilityEndDate": new Date(2021, 1, 10)},
-        {
-          "shiftId": 2,
-          "unavailabilityStartDate": new Date(2021, 1, 14),
-          "boardingDate": new Date(2021, 1, 15),
-          "leavingDate": new Date(2021, 1, 17),          
-          "unavailabilityEndDate": new Date(2021, 1, 18)
-        }
-      ];
-      setShifts(data1);
     }, []);
-    
 
+
+    // Drawer handlers
     const handleDrawerOpen = () => {
         setOpen(true);
     }
@@ -237,7 +230,7 @@ export default function Home() {
                   <Calendar shifts={shifts}/>
                 </Route>                
                 <Route path={`${match.path}/shifts`}>
-                  <Shifts shifts={shifts} />
+                  <Shifts shifts={shifts} fetchShifts={fetchShifts} />
                 </Route>
                 <Route path={`${match.path}/events`}>
                   <h3>Events</h3>

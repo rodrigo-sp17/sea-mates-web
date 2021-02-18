@@ -13,19 +13,31 @@ function Alert(props) {
 
 
 export default function Shifts(props) {
-    const [checked, setChecked] = React.useState([0]);
     const history = useHistory();
-
-
-    const successDeleteMsg = "Escala(s) deletada(s)!";
-    const [errorMsg, setErrorMsg] = useState("");
-    const [shiftSuccess, setSuccess] = useState(false);
+    
+    // Shift selection state (through checkbox)
+    const [checked, setChecked] = React.useState([0]);
+    
+    // Snack state
     const [snack, showSnack] = useState(false);
+    const [shiftSuccess, setSuccess] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("Sucesso!");
+    const [errorMsg, setErrorMsg] = useState("");
+    
+    // Shift deletion state
+    const successDeleteMsg = "Escala(s) deletada(s)!";
     
     const deleteShift = (event) => {
         event.preventDefault();
         //validate();
-        
+
+        if (checked.length === 1) {
+            setSuccess(false);
+            setErrorMsg("Nenhuma escala selecionada!");
+            showSnack(true);
+            return;
+        }
+
         checked.forEach(id => {                       
             fetch("/api/shift/remove?id=" + id, {
                 method: 'DELETE',
@@ -37,13 +49,14 @@ export default function Shifts(props) {
             .then(res => {
                 if (res.status === 204) {
                     setSuccess(true);
+                    setSuccessMsg(successDeleteMsg);
                     showSnack(true);
                     setTimeout(() => { history.push('/home/shifts'); }, 2000);
                 } else if (res.status === 403) {
                     history.push('/login');                    
                     throw new Error('Usuário não logado!');
                 } else {
-                    throw res;
+                    throw new Error('Unexpected server response' + res.status);
                 }
             })
             .catch(err => {
@@ -51,6 +64,9 @@ export default function Shifts(props) {
                 showSnack(true);
             });
         });
+
+        // Forces reloading of shifts after modification
+        props.fetchShifts();
     };
 
 
@@ -59,12 +75,13 @@ export default function Shifts(props) {
         const currentIndex = checked.indexOf(shift.shiftId);
         const newChecked = [...checked];
 
+        
         if (currentIndex === -1) {
             newChecked.push(shift.shiftId);
         } else {
             newChecked.splice(currentIndex, 1);
         }
-
+        
         setChecked(newChecked);
     };
 
@@ -73,7 +90,7 @@ export default function Shifts(props) {
         <Grid container direction="column" alignItems="stretch">
             <Grid container justify="center">
                 <List>
-                    {props.shifts.map(shift => (
+                    {props.shifts === null ? [] : props.shifts.map(shift => (
                         <ListItem key={shift} button onClick={handleToggle(shift)}>
                             <ListItemIcon>
                                 <Checkbox
@@ -89,7 +106,7 @@ export default function Shifts(props) {
                                 </Typography>
                             </ListItemAvatar>
                             <ListItemText 
-                                primary={`de ${shift.unavailabilityStartDate.toLocaleDateString()} até ${shift.unavailabilityEndDate.toLocaleDateString()}`}
+                                primary={`de ${shift.unavailabilityStartDate} até ${shift.unavailabilityEndDate}`}
                             />                        
                         </ListItem>
                     ))}
@@ -114,7 +131,7 @@ export default function Shifts(props) {
             <Grid>
                 <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
                             {shiftSuccess
-                                ? <Alert severity="success">{successDeleteMsg}</Alert>
+                                ? <Alert severity="success">{successMsg}</Alert>
                                 : <Alert severity="error" >{errorMsg}</Alert>
                             }
                 </Snackbar>

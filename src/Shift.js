@@ -59,15 +59,21 @@ function Alert(props) {
 export default function Shift(props) {
     const classes = useStyles();
     const history = useHistory();
-
+    
+    // Snack state
+    const [snack, showSnack] = useState(false);
+    const successMsg = "Escala(s) salva!";
+    const [errorMsg, setErrorMsg] = useState("");
+    const [shiftSuccess, setSuccess] = useState(false);
+    
+    // Shift state
     const [unavailableDate, setUnavailableDate] = useState(new Date());
     const [boardingDate, setBoardingDate] = useState(new Date());
     const [leavingDate, setLeavingDate] = useState(new Date());
     const [availableDate, setAvailableDate] = useState(new Date());
     const [cycleDays, setCycleDays] = useState(0);
-    const [repeat, setRepeat] = useState(0);
-
     const [useCycle, setUseCycle] = useState(false);
+    const [repeat, setRepeat] = useState(0);
   
     // Handlers
     const handleUseCycle = (event) => {
@@ -102,11 +108,6 @@ export default function Shift(props) {
         const result = addDays(boardingDate, cycleValue);       
         return result;
     }
-
-    const successMsg = "Escala(s) adicionada!";
-    const [errorMsg, setErrorMsg] = useState("");
-    const [shiftSuccess, setSuccess] = useState(false);
-    const [snack, showSnack] = useState(false);
 
     const submit = (event) => {
         event.preventDefault();
@@ -146,9 +147,8 @@ export default function Shift(props) {
     };
 
     const validate = () => {
-        // TODO validation
+        // TODO - validation
     }
-
 
     return (
         <Container component="main">
