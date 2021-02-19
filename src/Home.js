@@ -117,8 +117,13 @@ export default function Home() {
       .then(res => res.json())
       .then(
         (result) => {
+          const newShifts = result._embedded;
+          if (newShifts === undefined) {
+            setShifts([]);
+          } else {
+            setShifts(newShifts.shiftList)
+          }
           setIsLoaded(true);
-          setShifts(result._embedded.shiftList);
         },
         (error) => {
           setIsLoaded(true);
