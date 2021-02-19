@@ -18,6 +18,7 @@ import { Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@mate
 import Calendar from './Calendar.js';
 import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
 import Shifts from './Shifts.js';
+import Friends from './Friends.js';
 
 
 const drawerWidth = 240;
@@ -129,6 +130,7 @@ export default function Home() {
 
     useEffect(() => {
       fetchShifts();
+//      fetchFriends();
     }, []);
 
 
@@ -228,6 +230,9 @@ export default function Home() {
                 </Route>
                 <Route path={`${match.path}/events`}>                  
                 </Route>
+                <Route path={`${match.path}/friends`}>
+                  <Friends />
+                </Route>                
                 <Route exact path={match.path}>
                   <Redirect to={`${match.path}/calendar`} />
                 </Route>
