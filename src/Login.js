@@ -64,6 +64,7 @@ export default function Login(props) {
             .then(res => {
                 if (res.ok) {
                     sessionStorage.setItem("token", res.headers.get("Authorization"));
+                    sessionStorage.setItem("loggedUsername", username);
                     setSuccess(true);
                     showSnack(true);
                     history.push('/home');

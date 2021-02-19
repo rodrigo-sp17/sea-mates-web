@@ -1,14 +1,16 @@
 import {React, useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {useHistory} from 'react-router-dom';
-import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
+import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, Chip } from '@material-ui/core';
 import { Add, RemoveCircleOutline} from '@material-ui/icons';
 import MuiAlert from '@material-ui/lab/Alert';
+import RequestDialog from './RequestDialog';
+import { isAfter, isBefore } from 'date-fns';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: 360,    
+    maxWidth: 500,    
   },
 }));
 
@@ -19,24 +21,109 @@ function Alert(props) {
 export default function Friends(props) {
   const classes = useStyles();
   const history = useHistory();
+
+  // Needed for filtering the requests from the server
+  const loggedUsername = sessionStorage.getItem('loggedUsername');
   
   // Dialog state
-  const [open, setOpen] = useState(false);
-
+  const [open, setOpen] = useState({
+    requestDialog: false,
+    deleteDialog: false,
+  });
+  
   // Friends state
   const [friends, setFriends] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [loadedFriends, setLoadedFriends] = useState(false);
+  const [loadedRequests, setLoadedRequests] = useState(false);
   
   // Snack state
   const [snack, showSnack] = useState(false);
   const [friendSuccess, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("Sucesso!");
   const [errorMsg, setErrorMsg] = useState("");  
+  
+  // API interaction functions
+  const requestFriendship = (username) => {
+    if (username !== null && username !== "") {
+      fetch("/api/friend/request?username=" + username, {
+        method: 'POST',
+        headers: {
+          'Authorization': sessionStorage.getItem('token')
+        }
+      })
+      .then(
+        (res) => {
+          switch (res.status) {
+            case 201:
+              setSuccessMsg('Amizade requisitada! Aguardando aprovação...');
+              setSuccess(true);
+              showSnack(true);
+              break;
+            case 403:
+              history.push('/login');
+              break;
+            case 400:
+              setErrorMsg('Não é possível ser amigo de si mesmo! Tente novamente.');
+              setSuccess(false);
+              showSnack(true);
+              break;
+            default:
+              setErrorMsg('Resposta inesperada do servidor: ' + res.text);
+              setSuccess(false);
+              showSnack(true);
+          }
+        },
+        (error) => {
+          setErrorMsg(error.message);
+          setSuccess(false);
+          showSnack(true);
+        }
+      );
+    }
 
+    setLoadedRequests(false);
+
+    // Closes dialog
+    setOpen({ ...open, requestDialog: false});
+  }
+
+  const acceptFriend = (friend) => (event) => {
+    fetch("/api/friend/accept?username=" + friend.userInfo.username, {
+      method: 'POST',
+      headers: {
+        'Authorization': sessionStorage.getItem('token')
+      }
+    })
+    .then(
+      (result) => {
+        switch (result.status) {
+          case 200:
+            setSuccessMsg('Amizade aceita!');
+            setSuccess(true);
+            showSnack(true);
+            break;
+          case 403:
+            history.push('/login');
+            return;
+          default:
+            setErrorMsg("Resposta inesperada do servidor" + result.status);
+            setSuccess(false);
+            showSnack(true);
+        }
+      },
+      (error) => {
+        setErrorMsg(error.message);
+        setSuccess(false);
+        showSnack(true);
+      }
+    );
+
+    setLoadedFriends(false);
+    setLoadedRequests(false);
+  }
+  
   const unfriend = (friend) => (event) => {
-    console.log("execute unfriend logic");
-    console.log(friend);
-
     fetch("/api/friend/remove?username=" + friend.userInfo.username, {
       method: 'DELETE',
       headers: {
@@ -53,21 +140,27 @@ export default function Friends(props) {
           history.push("/login");
           return;
         } else {
-          throw new Error('Unexpected server response' + res.status);
+          setErrorMsg('Resposta inesperada do servidor: ' + res.status);
+          setSuccess(false);
+          showSnack(true);
         }
       },
       (error) => {
         setErrorMsg(error.message);
+        setSuccess(false);
         showSnack(true);
       }
     );
 
     // Refetch friends
-    setLoaded(false);
+    setLoadedFriends(false);
 
-    setOpen(false);
+    // Closes delete dialog
+    setOpen({ ...open, deleteDialog: false});
   };
 
+  
+  
   // Fetches friends from API
   const fetchFriends = () => {
     fetch("/api/friend", {
@@ -96,54 +189,130 @@ export default function Friends(props) {
         } else {
           setFriends(newFriends.appUserList);
         }
-        setLoaded(true);
+        //setLoadedFriends(true);
       },
       (error) => {
         console.log(error);
         setFriends([]);
-        setLoaded(true);
+        //setLoadedFriends(true);
       }
-    )
-  }
-
+      )
+    }
+    
+  // Fetches friend requests from API
+  const fetchRequests = () => {
+    fetch('/api/friend/request', {
+      method: 'GET',
+      headers: {
+        'Authorization': sessionStorage.getItem('token')
+      }
+    })
+    .then(res => {
+      switch (res.status) {
+        case 200:
+          return res.json();
+          case 403:
+            history.push('/login');
+            return;
+            default:
+        console.log('Unexpected response status: ' + res.status);
+        return;
+      }
+    })
+    .then(
+      (result) => {
+        const newRequests = result._embedded;
+        if (newRequests === undefined) {
+          setRequests([]);
+        } else {
+          setRequests(newRequests.friendRequestList);
+        }
+      }
+      )
+    }
+  
+  // Fetches state from API
   useEffect(() => {
     fetchFriends();
-  }, [loaded])
+    return () => setLoadedFriends(true);
+  }, [loadedFriends])
   
+  useEffect(() => {
+    fetchRequests();
+    return () => setLoadedRequests(true);
+  }, [loadedRequests])
+  
+  const toggleDialog = (dialog, open) => (event) => {
+    setOpen({ ...open, [dialog]: open });
+  }
+  
+  // Returns true if today is outside the shifts, or false if it is inside
+  const isAvailableNow = (shifts) => {
+    const now = Date.now();
+    return shifts.every((shift) => {
+      const startDate = new Date(shift.unavailabilityStartDate);
+      const endDate = new Date(shift.unavailabilityEndDate);
 
-  const openDialog = () => {
-    setOpen(true);
+      return isBefore(now, startDate) && isAfter(now, endDate);
+    })
   }
 
-  const closeDialog = () => {
-    setOpen(false);
-  }
- 
   return (
     <Grid container direction="column" alignItems="stretch">
-      <Grid container justify="center" >
+      <Grid container direction="column" alignItems="center">
+        <List className={classes.root}>
+          {requests.map(request => (
+            request.source.userInfo.username === loggedUsername
+            ?
+            <ListItem button key={request}> 
+                <ListItemText inset
+                  primary={request.target.userInfo.username}
+                  secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
+                  />                  
+                <ListItemIcon >
+                  <Button edge="end" color="primary">Aguardando aprovação</Button>
+                </ListItemIcon>
+              </ListItem>
+            :
+            <ListItem button key={request}> 
+                <ListItemText inset
+                  primary={request.source.userInfo.username}
+                  secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
+                  />    
+                <ListItemIcon>
+                  <Button color="primary" onClick={acceptFriend(request.source)}>Aceitar</Button> 
+                </ListItemIcon>
+              </ListItem>                           
+          ))}
+        </List>
+        <Divider />
         <List className={classes.root}>
           {friends.map(friend => (
             <ListItem button key={friend}>
-              <ListItemText
-                
+              <ListItemText inset             
                 primary={friend.userInfo.name}
                 secondary={friend.userInfo.username}
               />
+              <ListItemText>
+                {isAvailableNow(friend.shifts) 
+                ? <Chip color="primary" label="Disponível" />
+                : <Chip color="secondary" label="Embarcado" />
+                }
+              </ListItemText>
               <ListItemIcon edge="end">
-                <IconButton onClick={openDialog}>
+                <IconButton onClick={toggleDialog('deleteDialog', true)}>
                   <RemoveCircleOutline color="error" />
                 </IconButton>
               </ListItemIcon>
-              <Dialog open={open}>
+              <Dialog open={open['deleteDialog']}>
                 <DialogTitle>
                   Deseja desfazer a amizade?
                 </DialogTitle>
                 <DialogActions>
-                  <Button color="primary" onClick={unfriend(friend)}>
+                  <Button autoFocus color="primary" onClick={unfriend(friend)}>
                     Aceitar
                   </Button>
-                  <Button color="primary" onClick={closeDialog}>
+                  <Button color="primary" onClick={toggleDialog('deleteDialog', false)}>
                     Cancelar
                   </Button>
                 </DialogActions>
@@ -153,7 +322,7 @@ export default function Friends(props) {
         </List>
       </Grid>
       <Grid container justify="flex-end">
-        <Fab color="primary" aria-label="add">
+        <Fab color="primary" aria-label="add" onClick={toggleDialog('requestDialog', true)}>
           <Add />
         </Fab>
       </Grid>
@@ -165,7 +334,7 @@ export default function Friends(props) {
           }
         </Snackbar>
       </Grid>
-
+      <RequestDialog onClose={requestFriendship} open={open['requestDialog']}/>
     </Grid>
   );
 
