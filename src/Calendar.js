@@ -1,16 +1,24 @@
-import React from 'react';
+import { React, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 import { Fab, Grid } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import EventDialog from './EventDialog';
 
 export default function Calendar(props) {
+    const [open, setOpen] = useState(false);
+    const [clickedDate, setClickedDate] = useState(Date.now());
+
+    const closeDialog = () => {
+        setOpen(false);
+    }
 
     // Handlers
-    const handleDayClick = () => {
-        // TODO: show event
+    const handleDayClick = (info) => {
+        setClickedDate(info.dateStr);
+        setOpen(true);
     }
 
     // Parses Shift objects to FullCalendars's Event objects
@@ -74,6 +82,7 @@ export default function Calendar(props) {
                     contentHeight="auto"
                     locale="pt-br"
                     events={parseEvents(props)}
+                    dateClick={handleDayClick}
                 />
             </Grid>
             <Grid container item justify="flex-end">
@@ -88,6 +97,7 @@ export default function Calendar(props) {
                     Escala
                 </Fab>
             </Grid>
+            <EventDialog open={open} onClose={closeDialog} date={clickedDate} />
         </Grid>
     );
 }
