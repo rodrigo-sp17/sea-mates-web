@@ -12,8 +12,8 @@ import Badge from '@material-ui/core/Badge';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import Drawer from '@material-ui/core/Drawer';
 //import Hidden from '@material-ui/core/Hidden';
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Button } from '@material-ui/core';
-import { Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
+import { Divider, List, ListItem, ListItemIcon, ListItemText, Button, Menu, MenuItem } from '@material-ui/core';
+import { AccountCircle, Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
 
 import Calendar from './Calendar.js';
 import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
@@ -94,9 +94,30 @@ export default function Home() {
     // Drawer state
     const [open, setOpen] = useState(false);
 
+    // Menu state
+    const [anchorEl, setAnchorEl] = useState(null);
+
     // Shifts state
     const [isLoaded, setIsLoaded] = useState(false);
     const [shifts, setShifts] = useState([]);
+
+    // Helper functions
+    const changeTitle = (newTitle) => {
+      setTitle(newTitle);
+    }
+
+    const logout = () => {
+      console.info("Logging out...");
+      
+      // Cleans session storage
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("loggedUsername");
+      
+      // Redirects to login
+      history.push("/login");
+
+      handleMenuClose();
+    }
 
     const fetchShifts = () => {
       fetch("/api/shift", {
@@ -108,8 +129,7 @@ export default function Home() {
       .then(res => {
         if (res.status === 403) {
           history.push("/login");
-          setShifts([]);
-          return;
+          return new Error("User not logged");
         } else if (res.ok) {
           return res;
         } else {
@@ -129,7 +149,7 @@ export default function Home() {
         },
         (error) => {
           setIsLoaded(true);
-          console.log(error);
+          console.warn(error);
           setShifts([]);
         }
       );
@@ -137,20 +157,25 @@ export default function Home() {
 
     useEffect(() => {
       fetchShifts();
-//      fetchFriends();
     }, []);
 
-    const changeTitle = (newTitle) => {
-      setTitle(newTitle);
-    }
 
-    // Drawer handlers
+    // Drawer handler
     const toggleDrawer = (open) => (event) => {
       if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
           return;
       }
       
       setOpen(open);
+    }
+
+    // Account menu handlers
+    const handleMenu = (event) => {
+      setAnchorEl(event.currentTarget);
+    }
+
+    const handleMenuClose = () => {
+      setAnchorEl(null);
     }
 
     return (
@@ -177,6 +202,24 @@ export default function Home() {
                             <NotificationsIcon />
                         </Badge>
                     </IconButton>
+                    <IconButton color="inherit" onClick={handleMenu}>
+                      <AccountCircle id="account-circle"/>
+                    </IconButton>
+                    <Menu 
+                      id="menu-account"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem disabled>
+                        {sessionStorage.getItem("loggedUsername")}
+                      </MenuItem>
+                      <Divider />
+                      <MenuItem onClick={logout}>
+                        Logout
+                      </MenuItem>                      
+                    </Menu>
                 </Toolbar>
             </AppBar>
             <Drawer
