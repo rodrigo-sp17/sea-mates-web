@@ -86,6 +86,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Home() {
     const classes = useStyles();
     const history = useHistory();
+    const [title, setTitle] = useState("Minha Escala");
+
     // Allows use of relative paths for nested contents
     let match = useRouteMatch();
     
@@ -138,6 +140,9 @@ export default function Home() {
 //      fetchFriends();
     }, []);
 
+    const changeTitle = (newTitle) => {
+      setTitle(newTitle);
+    }
 
     // Drawer handlers
     const toggleDrawer = (open) => (event) => {
@@ -165,7 +170,7 @@ export default function Home() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
-                      Minha Escala    
+                      {title}   
                     </Typography>
                     <IconButton color="inherit" >
                         <Badge badgeContent={0} color="secondary">
@@ -228,15 +233,15 @@ export default function Home() {
             <main className={classes.content}>
               <Switch>
                 <Route path={`${match.path}/calendar`}>                  
-                  <Calendar shifts={shifts}/>
+                  <Calendar shifts={shifts} changeTitle={changeTitle}/>
                 </Route>                
                 <Route path={`${match.path}/shifts`}>
-                  <Shifts shifts={shifts} fetchShifts={fetchShifts} />
+                  <Shifts shifts={shifts} fetchShifts={fetchShifts} changeTitle={changeTitle} />
                 </Route>
                 <Route path={`${match.path}/events`}>                  
                 </Route>
                 <Route path={`${match.path}/friends`}>
-                  <Friends />
+                  <Friends changeTitle={changeTitle} />
                 </Route>                
                 <Route exact path={match.path}>
                   <Redirect to={`${match.path}/calendar`} />

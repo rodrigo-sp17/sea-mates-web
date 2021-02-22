@@ -42,6 +42,11 @@ export default function Friends(props) {
   const [friendSuccess, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("Sucesso!");
   const [errorMsg, setErrorMsg] = useState("");  
+
+  // Changes parent title
+  useEffect(() => {
+    props.changeTitle("Amigos");
+  }, [])
   
   // API interaction functions
   const requestFriendship = (username) => {

@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
@@ -20,6 +20,11 @@ export default function Calendar(props) {
         setClickedDate(info.dateStr);
         setOpen(true);
     }
+
+    // Changes parent title
+    useEffect(() => {
+        props.changeTitle("Calendário");
+    }, [])
 
     // Parses Shift objects to FullCalendars's Event objects
     // Shifts are assumed to always be a Shift array/list

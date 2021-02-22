@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -23,6 +23,11 @@ export default function Shifts(props) {
     const [shiftSuccess, setSuccess] = useState(false);
     const [successMsg, setSuccessMsg] = useState("Sucesso!");
     const [errorMsg, setErrorMsg] = useState("");
+
+    // Changes parent title
+    useEffect(() => {
+        props.changeTitle("Escalas");
+    }, [])
     
     // Shift deletion state
     const successDeleteMsg = "Escala(s) deletada(s)!";
