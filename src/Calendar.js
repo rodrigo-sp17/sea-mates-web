@@ -9,7 +9,7 @@ import EventDialog from './EventDialog';
 
 export default function Calendar(props) {
     const [open, setOpen] = useState(false);
-    const [clickedDate, setClickedDate] = useState(Date.now());
+    const [clickedDate, setClickedDate] = useState(new Date().toISOString());
 
     const closeDialog = () => {
         setOpen(false);
