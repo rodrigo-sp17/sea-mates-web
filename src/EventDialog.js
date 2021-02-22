@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, List, ListItem, ListItemText, Typography } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 
 EventDialog.propTypes = {
   date: PropTypes.string.isRequired,
@@ -11,6 +12,7 @@ EventDialog.propTypes = {
 export default function EventDialog(props) {
   const { open, onClose, date } = props;
   const parsedDate = new Date(date);
+  const history = useHistory();
 
   const [friends, setFriends] = useState([]);
   const [loaded, setLoaded] = useState(false);
@@ -25,6 +27,9 @@ export default function EventDialog(props) {
     .then(res => {
       if (res.ok) {
         return res.json();
+      } else if (res.status === 403) {
+        history.push("/login");
+        return new Error("User not logged");        
       } else {
         console.log("Error fetching friends" + res.status);
         setFriends([]);
@@ -32,7 +37,7 @@ export default function EventDialog(props) {
     })
     .then(
       (result) => {
-        if (result === undefined) {
+        if (result._embedded === undefined) {
           setFriends([]);
         } else {
           setFriends(result._embedded.appUserList);

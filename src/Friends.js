@@ -216,12 +216,12 @@ export default function Friends(props) {
       switch (res.status) {
         case 200:
           return res.json();
-          case 403:
-            history.push('/login');
-            return;
-            default:
-        console.log('Unexpected response status: ' + res.status);
-        return;
+        case 403:
+          history.push('/login');
+          return new Error("User not logged");
+        default:
+          console.log('Unexpected response status: ' + res.status);
+          return;
       }
     })
     .then(
@@ -232,9 +232,12 @@ export default function Friends(props) {
         } else {
           setRequests(newRequests.friendRequestList);
         }
+      }, 
+      (error) => {
+        console.warn(error);
       }
-      )
-    }
+    )
+  }
   
   // Fetches state from API
   useEffect(() => {
