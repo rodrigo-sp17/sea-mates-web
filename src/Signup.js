@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import MuiAlert from '@material-ui/lab/Alert';
+import Alert from './Alert';
 import { useHistory } from 'react-router-dom';
 import { Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 
@@ -27,11 +27,6 @@ const useStyles = makeStyles((theme) => ({
         display:'none',
     },
 }));
-
-
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export default function Signup(props) {    
     const classes = useStyles();

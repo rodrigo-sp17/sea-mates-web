@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
-import MuiAlert from '@material-ui/lab/Alert';
+import Alert from './Alert';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Container from '@material-ui/core/Container';
@@ -50,11 +50,6 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
     },  
   }));
-
-
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export default function Shift(props) {
     const classes = useStyles();

@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import MuiAlert from '@material-ui/lab/Alert';
+import Alert from './Alert';
 import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, TableContainer, Typography } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-
-
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 
 export default function Shifts(props) {
     const history = useHistory();

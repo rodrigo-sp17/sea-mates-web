@@ -157,7 +157,8 @@ export default function Home() {
 
     useEffect(() => {
       fetchShifts();
-    }, []);
+      setIsLoaded(true);
+    }, [isLoaded]);
 
 
     // Drawer handler
