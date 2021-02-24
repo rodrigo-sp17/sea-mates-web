@@ -6,8 +6,16 @@ export default function RequestDialog(props) {
   const { onClose, open } = props;
   const [username, setUsername] = useState("");
   
-  const submit = (name) => (event) => {
-    onClose(name);
+  const submit = (event) => {
+    onClose(username);
+  }
+
+  const cancel = () => {
+    onClose("");
+  }
+
+  const handleChange = (event) => {
+    setUsername(event.target.value);
   }
 
   return (
@@ -24,13 +32,14 @@ export default function RequestDialog(props) {
             id="username"
             label="Nome de usuário"
             type="text"
+            value={username}
             fullWidth
-            onChange={(event) => setUsername(event.target.value)}
+            onChange={handleChange}
           />
         </DialogContent>
         <DialogActions>
-          <Button color="primary" onClick={submit(username)}>Requisitar</Button>
-          <Button color="primary" onClick={submit("")}>Cancelar</Button>
+          <Button color="primary" onClick={submit}>Requisitar</Button>
+          <Button color="primary" onClick={cancel}>Cancelar</Button>
         </DialogActions>
       </Dialog>
     </Grid>
