@@ -73,8 +73,13 @@ export default function Friends(props) {
               setSuccess(false);
               showSnack(true);
               break;
+            case 404:
+              setErrorMsg('Usuário não encontrado!');
+              setSuccess(false);
+              showSnack(true);
+              break;
             default:
-              setErrorMsg('Resposta inesperada do servidor: ' + res.text);
+              setErrorMsg('Resposta inesperada do servidor: ' + res);
               setSuccess(false);
               showSnack(true);
           }
