@@ -31,8 +31,9 @@ export default function EventDialog(props) {
         history.push("/login");
         return new Error("User not logged");        
       } else {
-        console.log("Error fetching friends" + res.status);
+        console.log("Error fetching friends: " + res.status);
         setFriends([]);
+        return new Error(res);
       }      
     })
     .then(

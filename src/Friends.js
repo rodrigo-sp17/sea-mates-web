@@ -179,10 +179,10 @@ export default function Friends(props) {
         return res;
       } else if (res.status === 403) {
         history.push("/login");
-        return;        
+        return new Error("Forbidden");        
       } else {
         console.log('Unexpected response status: ' + res.status);
-        return;
+        return new Error(res);
       }
     })
     .then(res => res.json())
@@ -194,15 +194,13 @@ export default function Friends(props) {
         } else {
           setFriends(newFriends.appUserList);
         }
-        //setLoadedFriends(true);
       },
       (error) => {
         console.log(error);
         setFriends([]);
-        //setLoadedFriends(true);
       }
-      )
-    }
+    )
+  }
     
   // Fetches friend requests from API
   const fetchRequests = () => {
@@ -221,7 +219,7 @@ export default function Friends(props) {
           return new Error("User not logged");
         default:
           console.log('Unexpected response status: ' + res.status);
-          return;
+          return new Error(res);
       }
     })
     .then(
