@@ -2,17 +2,17 @@
 //import './App.css';
 import React from 'react';
 import Home from './Home.js';
-import Login from './Login.js';
+import Login from './auth/Login.js';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect
 } from "react-router-dom";
-import Signup from './Signup.js';
-import Shift from './Shift.js';
-import Recovery from './Recovery.js';
-import PasswordReset from './PasswordReset.js';
+import Signup from './auth/Signup.js';
+import Shift from './shifts/Shift.js';
+import Recovery from './auth/Recovery.js';
+import PasswordReset from './auth/PasswordReset.js';
 
 
 function PrivateRoute({ children, ...rest }) {

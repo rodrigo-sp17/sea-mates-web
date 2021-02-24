@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {useHistory} from 'react-router-dom';
 import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, Chip } from '@material-ui/core';
 import { Add, RemoveCircleOutline} from '@material-ui/icons';
-import Alert from './Alert';
+import Alert from '../components/Alert';
 import RequestDialog from './RequestDialog';
 import { isAfter, isBefore } from 'date-fns';
 

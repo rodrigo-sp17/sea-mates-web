@@ -4,21 +4,19 @@ import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
-import Container from '@material-ui/core/Container';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import Drawer from '@material-ui/core/Drawer';
-//import Hidden from '@material-ui/core/Hidden';
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Button, Menu, MenuItem } from '@material-ui/core';
-import { AccountCircle, Add, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
+import { Divider, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core';
+import { AccountCircle, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
 
-import Calendar from './Calendar.js';
+import Calendar from './calendar/Calendar.js';
 import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
-import Shifts from './Shifts.js';
-import Friends from './Friends.js';
+import Shifts from './shifts/Shifts.js';
+import Friends from './friends/Friends.js';
 
 
 const drawerWidth = 240;

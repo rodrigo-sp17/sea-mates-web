@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Alert from './Alert';
-import { useHistory } from 'react-router-dom';
+import Alert from 'components/Alert'
 import { Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,50 +28,51 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Signup(props) {    
+export default function Login(props) {    
     const classes = useStyles();
     const history = useHistory();
 
     const[username, setUsername] = useState("");
     const[password, setPassword] = useState("");
-    const[confirmPassword, setConfirmPassword] = useState("");
-    const[name, setName] = useState("");    
-    const[email, setEmail] = useState("");
-
-    const successMsg = "Usuário criado com sucesso!";
+    const successMsg = "Login com sucesso!";
     const[errorMsg, setErrorMsg] = useState("");
-    const[signupSuccess, setSuccess] = useState(false);
+    const[loginSuccess, setSuccess] = useState(false);
     const[snack, showSnack] = useState(false);
-    
-    const sendSignup = () => {
-        const url = "/api/user/signup";
+
+    const redirectSignup = () => {
+        history.push('/signup');
+    }
+
+    const redirectRecovery =() => {
+        history.push('/recovery');
+    }
+
+    const sendLogin = () => {
+        const url = "/login";
         const options = {
-            method: 'POST',            
-            headers: { 
-                'Content-Type': 'application/json;charset=utf-8' 
-            },    
+            method: 'POST',
+            mode: 'no-cors',              
             body: JSON.stringify({
-                "name": name,
-                "email": email,                
-                "username": username,
-                "password": password,
-                "confirmPassword": confirmPassword
+                username: username,
+                password: password
             })
         };
         
         fetch(url, options)
             .then(res => {
-                if (res.status === 201) {
+                if (res.ok) {
+                    sessionStorage.setItem("token", res.headers.get("Authorization"));
+                    sessionStorage.setItem("loggedUsername", username);
                     setSuccess(true);
                     showSnack(true);
-                    setTimeout(() => { history.push('/login'); }, 2000);
+                    history.push('/home');
                 } else {
                     setSuccess(false);
-                    throw new Error("Não foi possivel criar o usuário! Tente novamente.");
+                    throw new Error("Usuário e/ou senha incorretos! Tente novamente.");
                 }                    
             })            
             .catch(error => {
-                if (!signupSuccess) {
+                if (!loginSuccess) {
                     setErrorMsg(error.message);                    
                 } else {
                     setErrorMsg("Falha ao comunicar com o servidor! Por favor, atualize o navegador e tente novamente");
@@ -82,7 +83,7 @@ export default function Signup(props) {
       
     const handleSubmit = (event) => {
         event.preventDefault();
-        sendSignup();        
+        sendLogin();        
     };    
     
     return(
@@ -90,32 +91,9 @@ export default function Signup(props) {
             <CssBaseline />
             <div className={classes.paper}>
                 <Typography variant="h4">
-                    Cadastrar novo usuário
+                    Minha Escala Offshore
                 </Typography>
                 <form onSubmit={handleSubmit} className={classes.form} noValidate>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="name"
-                        label="Nome e Sobrenome"
-                        name="name"
-                        autoFocus
-                        onChange={i => setName(i.target.value)}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Endereço de Email"
-                        name="email"
-                        autoComplete="email"
-                        onChange={i => setEmail(i.target.value)}
-                    />
-                    
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -125,6 +103,7 @@ export default function Signup(props) {
                         label="Nome de Usuário"
                         name="username"
                         autoComplete="username"
+                        autoFocus
                         onChange={i => setUsername(i.target.value)}
                     />
                     <TextField 
@@ -138,19 +117,7 @@ export default function Signup(props) {
                         type="password"
                         autoComplete="current-password"
                         onChange={i => setPassword(i.target.value)}
-                    />
-                    <TextField 
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="confirmPassword"
-                        label="Confirmar Senha"
-                        name="confirmPassword"
-                        type="password"
-                        autoComplete="current-password"
-                        onChange={i => setConfirmPassword(i.target.value)}
-                    />                            
+                    />                    
                     <Button
                         type="submit"
                         fullWidth
@@ -158,15 +125,27 @@ export default function Signup(props) {
                         color="primary"
                         className={classes.submit}                 
                     >
-                        Cadastrar
-                    </Button>                    
+                        Entrar
+                    </Button>
+                    <Grid container>
+                        <Grid item xs>
+                            <Link href="#" variant="body2" onClick={redirectRecovery}>
+                                Esqueceu sua senha?
+                            </Link>
+                        </Grid>
+                        <Grid item>
+                            <Link href="#" variant="body2" onClick={redirectSignup}>
+                                {"Não tem uma conta? Cadastre-se!"}
+                            </Link>
+                        </Grid>
+                    </Grid>
                 </form>
                 <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
-                        {signupSuccess
+                        {loginSuccess
                             ? <Alert severity="success">{successMsg}</Alert>
                             : <Alert severity="error" >{errorMsg}</Alert>
-                        }
-                </Snackbar>
+                        }                       
+                </Snackbar>                
             </div>            
         </Container>
     );
