@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-  }
+}
 
 
 export default function Login(props) {    
@@ -47,6 +47,10 @@ export default function Login(props) {
 
     const redirectSignup = () => {
         history.push('/signup');
+    }
+
+    const redirectRecovery =() => {
+        history.push('/recovery');
     }
 
     const sendLogin = () => {
@@ -131,7 +135,7 @@ export default function Login(props) {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link variant="body2">
+                            <Link href="#" variant="body2" onClick={redirectRecovery}>
                                 Esqueceu sua senha?
                             </Link>
                         </Grid>

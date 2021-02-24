@@ -1,17 +1,18 @@
 //import logo from './logo.svg';
 //import './App.css';
-import React, { useState } from 'react';
+import React from 'react';
 import Home from './Home.js';
 import Login from './Login.js';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   Redirect
 } from "react-router-dom";
 import Signup from './Signup.js';
 import Shift from './Shift.js';
+import Recovery from './Recovery.js';
+import PasswordReset from './PasswordReset.js';
 
 
 function PrivateRoute({ children, ...rest }) {
@@ -35,6 +36,7 @@ function PrivateRoute({ children, ...rest }) {
   );
 }
 
+
 export default function App() {
 
   // Main routing for the application
@@ -55,10 +57,16 @@ export default function App() {
         </Route>        
         <Route exact path="/shift">
           <Shift />
-        </Route>        
+        </Route>
+        <Route exact path="/recovery">
+          <Recovery />
+        </Route>
+        <Route exact path="/changePassword"><PasswordReset /></Route>
       </Switch>
     </Router>
   );
+
+
 
   /* <div className="App">
       <header className="App-header">
