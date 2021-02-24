@@ -145,6 +145,13 @@ export default function Shift(props) {
         // TODO - validation
     }
 
+    const closeSnack = () => {
+        showSnack(false);
+        if (shiftSuccess) {
+            history.goBack();
+        }
+    }
+
     return (
         <Container component="main">
             <div>
@@ -283,7 +290,7 @@ export default function Shift(props) {
                     <FormHelperText>Selecione por quantas vezes repetir a escala</FormHelperText>
                 </FormControl>
             </Grid>
-            <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
+            <Snackbar open={snack} autoHideDuration={3000} onClose={closeSnack} >
                         {shiftSuccess
                             ? <Alert severity="success">{successMsg}</Alert>
                             : <Alert severity="error" >{errorMsg}</Alert>
