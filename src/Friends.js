@@ -93,8 +93,8 @@ export default function Friends(props) {
     setOpen({ ...open, requestDialog: false});
   }
 
-  const acceptFriend = (friend) => (event) => {
-    fetch("/api/friend/accept?username=" + friend.userInfo.username, {
+  const acceptFriend = (username) => (event) => {
+    fetch("/api/friend/accept?username=" + username, {
       method: 'POST',
       headers: {
         'Authorization': sessionStorage.getItem('token')
@@ -128,8 +128,8 @@ export default function Friends(props) {
     setLoadedRequests(false);
   }
   
-  const unfriend = (friend) => (event) => {
-    fetch("/api/friend/remove?username=" + friend.userInfo.username, {
+  const unfriend = (username) => (event) => {
+    fetch("/api/friend/remove?username=" + username, {
       method: 'DELETE',
       headers: {
         'Authorization': sessionStorage.getItem('token')
@@ -228,7 +228,7 @@ export default function Friends(props) {
         if (newRequests === undefined) {
           setRequests([]);
         } else {
-          setRequests(newRequests.friendRequestList);
+          setRequests(newRequests.friendRequestDTOList);
         }
       }, 
       (error) => {
@@ -240,12 +240,12 @@ export default function Friends(props) {
   // Fetches state from API
   useEffect(() => {
     fetchFriends();
-    return () => setLoadedFriends(true);
+    setLoadedFriends(true);
   }, [loadedFriends])
   
   useEffect(() => {
     fetchRequests();
-    return () => setLoadedRequests(true);
+    setLoadedRequests(true);
   }, [loadedRequests])
   
   const toggleDialog = (dialog, open) => (event) => {
@@ -268,11 +268,11 @@ export default function Friends(props) {
       <Grid container direction="column" alignItems="center">
         <List className={classes.root}>
           {requests.map(request => (
-            request.source.userInfo.username === loggedUsername
+            request.sourceUsername === loggedUsername
             ?
             <ListItem button key={request}> 
                 <ListItemText inset
-                  primary={request.target.userInfo.username}
+                  primary={request.targetUsername}
                   secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
                   />                  
                 <ListItemIcon >
@@ -282,11 +282,11 @@ export default function Friends(props) {
             :
             <ListItem button key={request}> 
                 <ListItemText inset
-                  primary={request.source.userInfo.username}
+                  primary={request.sourceUsername}
                   secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
                   />    
                 <ListItemIcon>
-                  <Button color="primary" onClick={acceptFriend(request.source)}>Aceitar</Button> 
+                  <Button color="primary" onClick={acceptFriend(request.sourceUsername)}>Aceitar</Button> 
                 </ListItemIcon>
               </ListItem>                           
           ))}
@@ -340,7 +340,7 @@ export default function Friends(props) {
           }
         </Snackbar>
       </Grid>
-      <RequestDialog onClose={requestFriendship} open={open['requestDialog']}/>
+      <RequestDialog onClose={requestFriendship} open={open.requestDialog}/>
     </Grid>
   );
 
