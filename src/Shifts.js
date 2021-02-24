@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, TableContainer, Typography } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
@@ -43,7 +42,8 @@ export default function Shifts(props) {
             return;
         }
 
-        checked.forEach(id => {                       
+        checked.forEach(id => {          
+            if (id === 0) return;             
             fetch("/api/shift/remove?id=" + id, {
                 method: 'DELETE',
                 headers: {
@@ -52,19 +52,24 @@ export default function Shifts(props) {
                 }
             })
             .then(res => {
-                if (res.status === 204) {
-                    setSuccess(true);
-                    setSuccessMsg(successDeleteMsg);
-                    showSnack(true);
-                    setTimeout(() => { history.push('/home/shifts'); }, 2000);
-                } else if (res.status === 403) {
-                    history.push('/login');                    
-                    throw new Error('Usuário não logado!');
-                } else {
-                    throw new Error('Unexpected server response' + res.status);
+                switch (res.status) {
+                    case 204:
+                      setSuccess(true);
+                      setSuccessMsg(successDeleteMsg);
+                      showSnack(true);
+                      setTimeout(() => { history.push('/home/shifts'); }, 2000);
+                      break;
+                    case 403:
+                      history.push('/login');                    
+                      throw new Error('Usuário não logado!');
+                    case 404:
+                      throw new Error('Escala não encontrada no servidor!');
+                    default:
+                      throw new Error('Unexpected server response: ' + res.status);
                 }
             })
             .catch(err => {
+                setSuccess(false);
                 setErrorMsg(err.message);
                 showSnack(true);
             });
