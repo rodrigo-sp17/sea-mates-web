@@ -8,7 +8,6 @@ export default function Account(props) {
   const history = useHistory();
 
   const logout = () => {
-    console.log("logging out");
   }
 
   return (

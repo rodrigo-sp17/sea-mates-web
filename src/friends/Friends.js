@@ -182,8 +182,7 @@ export default function Friends(props) {
         history.push("/login");
         return new Error("Forbidden");        
       } else {
-        console.log('Unexpected response status: ' + res.status);
-        return new Error(res);
+        return new Error('Unexpected response status: ' + res.status);
       }
     })
     .then(res => res.json())
@@ -197,7 +196,6 @@ export default function Friends(props) {
         }
       },
       (error) => {
-        console.log(error);
         setFriends([]);
       }
     )
@@ -219,7 +217,6 @@ export default function Friends(props) {
           history.push('/login');
           return new Error("User not logged");
         default:
-          console.log('Unexpected response status: ' + res.status);
           return new Error(res);
       }
     })
@@ -233,7 +230,7 @@ export default function Friends(props) {
         }
       }, 
       (error) => {
-        console.warn(error);
+        setRequests([]);
       }
     )
   }
