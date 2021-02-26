@@ -32,8 +32,10 @@ export default function Login() {
     const classes = useStyles();
     const history = useHistory();
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [state, setState] = useState({
+      username: "",
+      password: ""
+    })
     const [isSubmitting, setSubmitting] = useState(false);
 
     // Snack state
@@ -56,38 +58,62 @@ export default function Login() {
             method: 'POST',
             mode: 'no-cors',              
             body: JSON.stringify({
-                username: username,
-                password: password
+                username: state.username,
+                password: state.password
             })
         };
-        
-        await fetch(url, options)
-            .then(res => {
-                if (res.ok) {
-                    sessionStorage.setItem("token", res.headers.get("Authorization"));
-                    sessionStorage.setItem("loggedUsername", username);
-                    setSuccess(true);
-                    showSnack(true);
-                    history.push('/home');
-                } else {
-                    setSuccess(false);
-                    throw new Error("Usuário e/ou senha incorretos! Tente novamente.");
-                }                    
-            })            
-            .catch(error => {
-                if (!loginSuccess) {
-                    setErrorMsg(error.message);                    
-                } else {
-                    setErrorMsg("Falha ao comunicar com o servidor! Por favor, atualize o navegador e tente novamente");
-                }              
-                showSnack(true);
-            });               
+
+        fetch(url, options)
+        .then(
+            (res) => {
+              switch (res.status) {
+                case 200:
+                  sessionStorage.setItem("token", res.headers.get("Authorization"));
+                  sessionStorage.setItem("loggedUsername", state.username);
+                  setSuccess(true);
+                  showSnack(true);
+                  setTimeout(() => {
+                    history.push("/home");
+                  }, 500);
+                  break;
+                case 403:
+                  setSuccess(false);
+                  setErrorMsg("Usuário ou senha incorretos!");
+                  break;
+                case 401:
+                  setSuccess(false);
+                  setErrorMsg("Usuário ou senha incorretos!");
+                  break;
+                case 500:
+                  setSuccess(false);
+                  setErrorMsg("Algo deu errado em nosso servidor!");
+                  break;
+                default:
+                  setSuccess(false);
+                  setErrorMsg("Erro inesperado do servidor: " + res.status);
+              }
+
+              showSnack(true);
+            },
+            (error) => {
+              setErrorMsg(error);
+              showSnack(true);
+            }
+        )            
     };
+
+    const handleChange = (event) => {
+      const name = event.target.name;
+      const value = event.target.value;
+      setState({
+        [name]: value
+      });
+    }
       
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
         setSubmitting(true);
-        await sendLogin();
+        sendLogin();
         setSubmitting(false);
     };    
     
@@ -113,7 +139,8 @@ export default function Login() {
                         name="username"
                         autoComplete="username"
                         autoFocus
-                        onChange={i => setUsername(i.target.value)}
+                        value={state.username}
+                        onChange={handleChange}
                     />
                     <TextField 
                         variant="outlined"
@@ -125,7 +152,8 @@ export default function Login() {
                         name="password"
                         type="password"
                         autoComplete="current-password"
-                        onChange={i => setPassword(i.target.value)}
+                        value={state.password}
+                        onChange={handleChange}
                     />
                     { isSubmitting && <LinearProgress />}           
                     <Button
