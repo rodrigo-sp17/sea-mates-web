@@ -105,8 +105,6 @@ export default function Home() {
     }
 
     const logout = () => {
-      console.info("Logging out...");
-      
       // Cleans session storage
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("loggedUsername");
@@ -130,8 +128,6 @@ export default function Home() {
           return new Error("User not logged");
         } else if (res.ok) {
           return res;
-        } else {
-          console.log("Unexpected response status: " + res.status);  
         }
       })
       .then(res => res.json())
@@ -147,7 +143,6 @@ export default function Home() {
         },
         (error) => {
           setIsLoaded(true);
-          console.warn(error);
           setShifts([]);
         }
       );
