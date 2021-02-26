@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from "yup";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, makeStyles, Typography } from '@material-ui/core';
+import { TextField } from 'formik-material-ui';
 import { useHistory, useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
-    maxWidth: 500,
-    alignContent: 'center'
+    marginTop: theme.spacing(6),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  form: {
+    width: '100%',
+    marginTop: theme.spacing(1),
   },
   header: {
     marginBottom: theme.spacing(2),
   },
   submit: {
-    marginTop: theme.spacing(1)
+    margin: theme.spacing(3, 0, 2)
   },
   footer: {
     marginTop: theme.spacing(2)
-  }  
+  }
 }))
 
 
@@ -37,7 +44,6 @@ export default function PasswordReset() {
     confirm: "",
   });
 
-  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
 
   // Dialog state
@@ -46,57 +52,10 @@ export default function PasswordReset() {
     title: "Ops...",
     message: "Um erro aconteceu! Contate-nos para mais informações!"
   })
-  
-  
-  const handleChange = (event) => {
-    setState({ ...formState, [event.target.name]: event.target.value});
-  }
 
-  const isValidPassword = (password) => {
-    if (password.length < 8 || password.length > 64) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  const isValidUsername = (username) => {
-    if (username.length === 0) return false;
-    return true;
-  }
-  
-  const validatePassword = () => {
-    const password = formState.password;
-    const confirm = formState.confirm;
-    setErrors({...errors,
-       password: !isValidPassword(password),
-      confirm: confirm !== password});
-  }
-  
-  const validateConfirm = () => {
-    if (formState.confirm !== formState.password) {
-      setErrors({...errors, confirm: true});
-    } else {
-      setErrors({...errors, confirm: false});
-    }
-  }
-
-  const submit = () => {
-    // Validating confirm
-    if (errors.confirm 
-      || errors.password 
-      || !isValidPassword(formState.password) 
-      || formState.password !== formState.confirm
-      || !isValidUsername(formState.username)) {
-      setDialog({
-        title: "Oops...",
-        message: "Por favor, preencha corretamente o formulário antes de enviar."
-      });
-      setOpen(true);
-      return;
-    }
+  const send = async () => {
     
-    fetch("/api/user/resetPassword", {
+    await fetch("/api/user/resetPassword", {
       method: 'POST',
       headers: {
         "reset": token,
@@ -152,78 +111,95 @@ export default function PasswordReset() {
     setOpen(false);
   }
 
-
   // Redirects to login page if no token is provided
-  if (token.length === 0) {
+  if (token === null) {
     history.push("/login");
   }
   
   return (
-    <Container className={classes.paper}>
-      <Grid container direction="column">
-        <Grid item className={classes.header}>
-          <Typography variant="h5">Recuperação de senha</Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            error={errors.username}
-            type="text"
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="username"
-            label="Nome de usuário"
-            value={formState.username}
-            onChange={handleChange}
-          />
-          <TextField
-            error={errors.password}
-            type="password"
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Nova senha"
-            helperText="Senhas devem ter entre 8 e 64 caracteres, conter letras maíusculas, minúsculas, números e um caractere especial"
-            value={formState.password}
-            onChange={handleChange}
-            onBlur={validatePassword}
-          />
-          <TextField
-            error={errors.confirm}
-            type="password" 
-            helperText={errors.confirm ? "Senha e confirmação não são iguais!" : ""}
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="confirm"
-            label="Confirme a nova senha"
-            value={formState.confirm}
-            onChange={handleChange}
-            onBlur={validateConfirm}
-          />
-          <Button className={classes.submit} variant="contained" color="primary" onClick={submit}>Enviar</Button>
-        </Grid>
-        <Grid item className={classes.footer}>
-
-        </Grid>
-      </Grid>
-      <Dialog open={open} fullWidth>
-        <DialogTitle>
-          {dialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {dialog.message}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog}>OK</Button>
-        </DialogActions>
-      </Dialog>
+    <Container component="main" maxWidth="xs">
+      <div className={classes.paper}>
+        <Typography variant="h4">Recuperação de senha</Typography>
+        <Formik
+          initialValues={{}}
+          validationSchema={Yup.object({
+            username: Yup.string()
+              .required("Obrigatório"),
+            password: Yup.string()
+              .min(8, "Mínimo de 8 caracteres")
+              .max(64, "Máximo de 64 caracteres")
+              .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[*.!@$%#^&(){}\[\]:;<>,.?~+-/|/=/\\]).*$/, "Senha deve ter maiúsculas, minúsculas, números e caracteres especiais")
+              .required("Obrigatório"),
+            confirm: Yup.string()
+              .oneOf([Yup.ref('password'), null], 'Senha e confirmação não são iguais')
+              .required("Obrigatório")
+          })}
+          onSubmit={async (values, { setSubmitting } ) => {
+            setState(values);
+            await send();
+            setSubmitting(false);
+          }}
+        >
+          {({ submitForm, isSubmitting }) => (
+            <Form className={classes.form}>
+              <Field
+                fullWidth
+                required
+                margin="normal"
+                variant="outlined"
+                component={TextField}
+                name="username"
+                type="text"
+                label="Nome de Usuário"
+              />
+              <Field
+                fullWidth
+                required
+                margin="normal"
+                variant="outlined"
+                component={TextField}
+                name="password"
+                type="password"
+                label="Senha"
+              />
+              <Field
+                fullWidth
+                required
+                margin="normal"
+                variant="outlined"
+                component={TextField}
+                name="confirm"
+                type="password"
+                label="Confirme sua senha"
+              />
+              { isSubmitting && <LinearProgress />}
+              <Button
+                className={classes.submit}
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+                type="submit"
+              >
+                Enviar
+              </Button>
+            </Form>
+          )}
+        </Formik>
+        <Dialog open={open} fullWidth>
+          <DialogTitle>
+            {dialog.title}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {dialog.message}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDialog}>OK</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </Container>
     )
 }
