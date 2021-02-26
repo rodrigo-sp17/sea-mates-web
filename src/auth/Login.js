@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'components/Alert'
-import { Avatar, Button, CssBaseline, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
 
@@ -106,6 +106,7 @@ export default function Login() {
       const name = event.target.name;
       const value = event.target.value;
       setState({
+        ...state,
         [name]: value
       });
     }
@@ -115,11 +116,14 @@ export default function Login() {
         setSubmitting(true);
         sendLogin();
         setSubmitting(false);
-    };    
+    };
+
+    if (sessionStorage.getItem('token') !== null) {
+      history.push("/home");
+    }
     
     return(
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
             <div className={classes.paper}>
                 <Avatar
                     className={classes.logo}
@@ -134,11 +138,10 @@ export default function Login() {
                         margin="normal"
                         required
                         fullWidth
-                        id="username"
                         label="Nome de Usuário"
                         name="username"
-                        autoComplete="username"
                         autoFocus
+                        autoComplete="username"
                         value={state.username}
                         onChange={handleChange}
                     />
@@ -147,7 +150,6 @@ export default function Login() {
                         margin="normal"
                         required
                         fullWidth
-                        id="password"
                         label="Senha"
                         name="password"
                         type="password"
