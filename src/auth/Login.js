@@ -94,7 +94,7 @@ export default function Login() {
                     className={classes.logo}
                     src={logo}
                 />
-                <Typography variant="h4">
+                <Typography variant="h3">
                     Agenda Marítima
                 </Typography>
                 <form onSubmit={handleSubmit} className={classes.form} noValidate>
