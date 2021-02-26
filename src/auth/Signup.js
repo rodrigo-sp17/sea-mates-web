@@ -1,49 +1,58 @@
 import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
 import Alert from '../components/Alert';
-import { useHistory } from 'react-router-dom';
-import { Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Link, useHistory } from 'react-router-dom';
+import { Avatar, Button, Grid, LinearProgress, makeStyles, Snackbar, Typography } from '@material-ui/core';
+import { TextField as MuiTextField } from 'formik-material-ui';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from "yup";
+import logo from 'logo.svg';
 
 
 const useStyles = makeStyles((theme) => ({
-    paper: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-    error: {
-        marginTop: theme.spacing(1),        
-    },
-    hide: {
-        display:'none',
-    },
+  paper: {
+    marginTop: theme.spacing(6),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  form: {
+    width: '100%',
+    marginTop: theme.spacing(1),        
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+  logo: {
+    width: theme.spacing(14),
+    height: theme.spacing(14),
+    margin: theme.spacing(1)
+  }
 }));
 
-export default function Signup(props) {    
+
+export default function Signup() {    
     const classes = useStyles();
     const history = useHistory();
 
-    const[username, setUsername] = useState("");
-    const[password, setPassword] = useState("");
-    const[confirmPassword, setConfirmPassword] = useState("");
-    const[name, setName] = useState("");    
-    const[email, setEmail] = useState("");
-
-    const successMsg = "Usuário criado com sucesso!";
-    const[errorMsg, setErrorMsg] = useState("");
+    const [values, setValues] = useState({
+        username: "",
+        password: "",
+        confirmPassword: "",
+        name: "",
+        email: ""        
+    })
+    
+    // Dialog state
+    const[message, setMessage] = useState("Erro crítico!");
     const[signupSuccess, setSuccess] = useState(false);
     const[snack, showSnack] = useState(false);
+
+    const redirectLogin = () => {
+      history.push("/login");
+    }
     
-    const sendSignup = () => {
+    const sendSignup = async () => {
         const url = "/api/user/signup";
         const options = {
             method: 'POST',            
@@ -51,124 +60,166 @@ export default function Signup(props) {
                 'Content-Type': 'application/json;charset=utf-8' 
             },    
             body: JSON.stringify({
-                "name": name,
-                "email": email,                
-                "username": username,
-                "password": password,
-                "confirmPassword": confirmPassword
+                "name": values.name,
+                "email": values.email,                
+                "username": values.username,
+                "password": values.password,
+                "confirmPassword": values.confirmPassword
             })
         };
         
-        fetch(url, options)
-            .then(res => {
-                if (res.status === 201) {
-                    setSuccess(true);
-                    showSnack(true);
-                    setTimeout(() => { history.push('/login'); }, 2000);
-                } else {
-                    setSuccess(false);
-                    throw new Error("Não foi possivel criar o usuário! Tente novamente.");
-                }                    
-            })            
-            .catch(error => {
-                if (!signupSuccess) {
-                    setErrorMsg(error.message);                    
-                } else {
-                    setErrorMsg("Falha ao comunicar com o servidor! Por favor, atualize o navegador e tente novamente");
-                }              
-                showSnack(true);
-            });               
+        await fetch(url, options)
+        .then(
+          (res) => {
+            switch (res.status) {
+              case 201:
+                setSuccess(true);
+                setMessage("Usuário criado com sucesso! Redirecionando para login...")
+                setTimeout(() => { history.push('/login'); }, 2000);
+                break;
+              case 400:
+                setSuccess(false);
+                setMessage("Dados da solicitação estão incorretos! Por favor, verifique-os e tente novamente!")
+                break;
+              case 500:
+                setSuccess(false);
+                setMessage("Erro inesperado do servidor! - 500");
+                break;
+              default:
+                setSuccess(false);
+                setMessage("Erro inesperado: " + res.status);
+            }
+          },
+          (error) => {
+            setSuccess(false);
+            setMessage(error.message);
+          }                             
+        );
+
+        showSnack(true);
     };
-      
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        sendSignup();        
-    };    
-    
-    return(
-        <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <div className={classes.paper}>
-                <Typography variant="h4">
-                    Cadastrar novo usuário
-                </Typography>
-                <form onSubmit={handleSubmit} className={classes.form} noValidate>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="name"
-                        label="Nome e Sobrenome"
-                        name="name"
-                        autoFocus
-                        onChange={i => setName(i.target.value)}
+     
+  return(
+      <Container component="main" maxWidth="xs">
+          <div className={classes.paper}>
+              <Avatar 
+                className={classes.logo}
+                src={logo}
+              />
+              <Typography variant="h4">
+                  Cadastrar novo usuário
+              </Typography>
+              <Formik
+                initialValues={{}}
+                validationSchema={Yup.object({
+                  name: Yup.string()
+                    .max(60, "Deve ter 60 caracteres ou menos")
+                    .matches(/^[a-zA-Z]+\s[a-zA-Z]+$/, "Nome inválido")
+                    .required("Obrigatório"),
+                  username: Yup.string()
+                    .min(6, "Mínimo de 6 letras")
+                    .max(30, "Máximo de 30 letras")
+                    .required("Obrigatório"),
+                  email: Yup.string()
+                    .email("E-mail inválido")
+                    .required("Obrigatório"),
+                  password: Yup.string()
+                    .min(8, "Mínimo de 8 caracteres")
+                    .max(64, "Máximo de 64 caracteres")
+                    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[*.!@$%#^&(){}\[\]:;<>,.?~+-/|/=/\\]).*$/, "Senha deve ter maiúsculas, minúsculas, números e caracteres especiais")
+                    .required("Obrigatório"),
+                  confirmPassword: Yup.string()
+                    .oneOf([Yup.ref('password'), null], 'Senha e confirmação não são iguais')
+                    .required("Obrigatório")
+                })}
+                onSubmit={async (values, { setSubmitting } ) => {
+                  setValues(values);
+                  await sendSignup();
+                  setSubmitting(false);                  
+                }}   
+              >
+                {({ submitForm, isSubmitting}) => (
+                  <Form className={classes.form}>
+                    <Field
+                      autoFocus
+                      fullWidth
+                      required
+                      margin="normal"
+                      variant="outlined"
+                      component={MuiTextField}
+                      name="name"
+                      type="text"
+                      label="Nome e Sobrenome"
                     />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Endereço de Email"
-                        name="email"
-                        autoComplete="email"
-                        onChange={i => setEmail(i.target.value)}
+                    <Field
+                      fullWidth
+                      required
+                      margin="normal"
+                      variant="outlined"
+                      component={MuiTextField}
+                      name="email"
+                      type="email"
+                      label="Endereço de e-mail"
                     />
-                    
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="username"
-                        label="Nome de Usuário"
-                        name="username"
-                        autoComplete="username"
-                        onChange={i => setUsername(i.target.value)}
+                    <Field
+                      fullWidth
+                      required
+                      margin="normal"
+                      variant="outlined"
+                      component={MuiTextField}
+                      name="username"
+                      type="text"
+                      label="Nome de Usuário"
                     />
-                    <TextField 
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="password"
-                        label="Senha"
-                        name="password"
-                        type="password"
-                        autoComplete="current-password"
-                        onChange={i => setPassword(i.target.value)}
+                    <Field
+                      fullWidth
+                      required
+                      margin="normal"
+                      variant="outlined"
+                      component={MuiTextField}
+                      name="password"
+                      type="password"
+                      label="Senha"
                     />
-                    <TextField 
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="confirmPassword"
-                        label="Confirmar Senha"
-                        name="confirmPassword"
-                        type="password"
-                        autoComplete="current-password"
-                        onChange={i => setConfirmPassword(i.target.value)}
-                    />                            
+                    <Field
+                      fullWidth
+                      required
+                      margin="normal"
+                      variant="outlined"
+                      component={MuiTextField}
+                      name="confirmPassword"
+                      type="password"
+                      label="Confirme sua senha"
+                    />
+                  { isSubmitting && <LinearProgress />}
                     <Button
-                        type="submit"
-                        fullWidth
-                        variant='contained'
-                        color="primary"
-                        className={classes.submit}                 
+                      className={classes.submit}
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      disabled={isSubmitting}
+                      type="submit"
                     >
-                        Cadastrar
-                    </Button>                    
-                </form>
-                <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
-                        {signupSuccess
-                            ? <Alert severity="success">{successMsg}</Alert>
-                            : <Alert severity="error" >{errorMsg}</Alert>
-                        }
-                </Snackbar>
-            </div>            
-        </Container>
-    );
+                      Cadastrar
+                    </Button>
+                  </Form>
+                )}
+              </Formik>
+              <Grid container>
+                <Grid item xs>
+                  <Link href="#" variant="body2" onClick={redirectLogin}>
+                    Voltar para Login
+                  </Link>
+                </Grid>
+              </Grid>
+              <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
+                      {signupSuccess
+                          ? <Alert severity="success">{message}</Alert>
+                          : <Alert severity="error" >{message}</Alert>
+                      }
+              </Snackbar>
+          </div>            
+      </Container>
+  );
 }
 

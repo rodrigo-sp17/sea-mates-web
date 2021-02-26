@@ -2,33 +2,33 @@ import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'components/Alert'
-import { Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import logo from 'logo.svg';
 
 
 const useStyles = makeStyles((theme) => ({
     paper: {
-        marginTop: theme.spacing(8),
+        marginTop: theme.spacing(6),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
     },
     form: {
         width: '100%',
-        marginTop: theme.spacing(1),
+        marginTop: theme.spacing(3),
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-    error: {
-        marginTop: theme.spacing(1),        
-    },
-    hide: {
-        display:'none',
-    },
+    logo: {
+        width: theme.spacing(14),
+        height: theme.spacing(14),
+        margin: theme.spacing(1)
+    }
 }));
 
-export default function Login(props) {    
+export default function Login() {    
     const classes = useStyles();
     const history = useHistory();
 
@@ -90,8 +90,12 @@ export default function Login(props) {
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
+                <Avatar
+                    className={classes.logo}
+                    src={logo}
+                />
                 <Typography variant="h4">
-                    Minha Escala Offshore
+                    Agenda Marítima
                 </Typography>
                 <form onSubmit={handleSubmit} className={classes.form} noValidate>
                     <TextField
