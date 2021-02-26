@@ -74,12 +74,16 @@ export default function Signup() {
             switch (res.status) {
               case 201:
                 setSuccess(true);
-                setMessage("Usuário criado com sucesso! Redirecionando para login...")
+                setMessage("Usuário criado com sucesso! Redirecionando para login...");
                 setTimeout(() => { history.push('/login'); }, 2000);
                 break;
               case 400:
                 setSuccess(false);
-                setMessage("Dados da solicitação estão incorretos! Por favor, verifique-os e tente novamente!")
+                setMessage("Dados da solicitação estão incorretos! Por favor, verifique-os e tente novamente!");
+                break;
+              case 409:
+                setSuccess(false);
+                setMessage("Nome de usuário não está disponível! Por favor, tente novamente.");
                 break;
               case 500:
                 setSuccess(false);
