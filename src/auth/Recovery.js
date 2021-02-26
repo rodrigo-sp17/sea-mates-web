@@ -49,8 +49,8 @@ export default function Recovery() {
     setInput(event.target.value);
   }
 
-  const submit = () => {
-    fetch("/api/user/recover?user=" + input, {
+  const submit = async () => {
+    await fetch("/api/user/recover?user=" + input, {
       method: 'POST'
     })
     .then(
