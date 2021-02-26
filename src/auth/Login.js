@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'components/Alert'
-import { Avatar, Button, CssBaseline, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, CssBaseline, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
 
@@ -32,12 +32,15 @@ export default function Login() {
     const classes = useStyles();
     const history = useHistory();
 
-    const[username, setUsername] = useState("");
-    const[password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isSubmitting, setSubmitting] = useState(false);
+
+    // Snack state
     const successMsg = "Login com sucesso!";
-    const[errorMsg, setErrorMsg] = useState("");
-    const[loginSuccess, setSuccess] = useState(false);
-    const[snack, showSnack] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [loginSuccess, setSuccess] = useState(false);
+    const [snack, showSnack] = useState(false);
 
     const redirectSignup = () => {
         history.push('/signup');
@@ -47,7 +50,7 @@ export default function Login() {
         history.push('/recovery');
     }
 
-    const sendLogin = () => {
+    const sendLogin = async () => {
         const url = "/login";
         const options = {
             method: 'POST',
@@ -58,7 +61,7 @@ export default function Login() {
             })
         };
         
-        fetch(url, options)
+        await fetch(url, options)
             .then(res => {
                 if (res.ok) {
                     sessionStorage.setItem("token", res.headers.get("Authorization"));
@@ -81,9 +84,11 @@ export default function Login() {
             });               
     };
       
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        sendLogin();        
+        setSubmitting(true);
+        await sendLogin();
+        setSubmitting(false);
     };    
     
     return(
@@ -121,12 +126,14 @@ export default function Login() {
                         type="password"
                         autoComplete="current-password"
                         onChange={i => setPassword(i.target.value)}
-                    />                    
+                    />
+                    { isSubmitting && <LinearProgress />}           
                     <Button
                         type="submit"
                         fullWidth
                         variant='contained'
                         color="primary"
+                        disabled={isSubmitting}
                         className={classes.submit}                 
                     >
                         Entrar
