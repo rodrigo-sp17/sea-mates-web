@@ -34,14 +34,6 @@ const useStyles = makeStyles((theme) => ({
 export default function Signup() {    
     const classes = useStyles();
     const history = useHistory();
-
-    const [values, setValues] = useState({
-        username: "",
-        password: "",
-        confirmPassword: "",
-        name: "",
-        email: ""        
-    })
     
     // Dialog state
     const[message, setMessage] = useState("Erro crítico!");
@@ -52,19 +44,19 @@ export default function Signup() {
       history.push("/login");
     }
     
-    const sendSignup = async () => {
+    const sendSignup =  async (values) => {
         const url = "/api/user/signup";
         const options = {
-            method: 'POST',            
+            method: 'POST',
             headers: { 
-                'Content-Type': 'application/json;charset=utf-8' 
+                'Content-Type': 'application/json' 
             },    
             body: JSON.stringify({
-                "name": values.name,
-                "email": values.email,                
-                "username": values.username,
-                "password": values.password,
-                "confirmPassword": values.confirmPassword
+                name: values.name,
+                email: values.email,                
+                username: values.username,
+                password: values.password,
+                confirmPassword: values.confirmPassword
             })
         };
         
@@ -75,19 +67,28 @@ export default function Signup() {
               case 201:
                 setSuccess(true);
                 setMessage("Usuário criado com sucesso! Redirecionando para login...")
+                showSnack(true);
                 setTimeout(() => { history.push('/login'); }, 2000);
                 break;
               case 400:
                 setSuccess(false);
                 setMessage("Dados da solicitação estão incorretos! Por favor, verifique-os e tente novamente!")
+                showSnack(true);
+                break;
+              case 409:
+                setSuccess(false);
+                setMessage("O usuário já existe! Por favor, escolha outro!");
+                showSnack(true);
                 break;
               case 500:
                 setSuccess(false);
                 setMessage("Erro inesperado do servidor! - 500");
+                showSnack(true);
                 break;
               default:
                 setSuccess(false);
                 setMessage("Erro inesperado: " + res.status);
+                showSnack(true);
             }
           },
           (error) => {
@@ -95,8 +96,6 @@ export default function Signup() {
             setMessage(error.message);
           }                             
         );
-
-        showSnack(true);
     };
      
   return(
@@ -133,9 +132,8 @@ export default function Signup() {
                     .required("Obrigatório")
                 })}
                 onSubmit={async (values, { setSubmitting } ) => {
-                  setValues(values);
-                  await sendSignup();
-                  setSubmitting(false);                  
+                  await sendSignup(values);
+                  setSubmitting(false);       
                 }}   
               >
                 {({ submitForm, isSubmitting}) => (

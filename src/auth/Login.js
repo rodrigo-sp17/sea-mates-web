@@ -63,7 +63,7 @@ export default function Login() {
             })
         };
 
-        fetch(url, options)
+        await fetch(url, options)
         .then(
             (res) => {
               switch (res.status) {
@@ -79,21 +79,23 @@ export default function Login() {
                 case 403:
                   setSuccess(false);
                   setErrorMsg("Usuário ou senha incorretos!");
+                  showSnack(true);
                   break;
                 case 401:
                   setSuccess(false);
                   setErrorMsg("Usuário ou senha incorretos!");
+                  showSnack(true);
                   break;
                 case 500:
                   setSuccess(false);
                   setErrorMsg("Algo deu errado em nosso servidor!");
+                  showSnack(true);
                   break;
                 default:
                   setSuccess(false);
                   setErrorMsg("Erro inesperado do servidor: " + res.status);
+                  showSnack(true);
               }
-
-              showSnack(true);
             },
             (error) => {
               setErrorMsg(error);
@@ -111,10 +113,10 @@ export default function Login() {
       });
     }
       
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         setSubmitting(true);
-        sendLogin();
+        await sendLogin();
         setSubmitting(false);
     };
 
