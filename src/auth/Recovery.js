@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Recovery() {
   const classes = useStyles();
   const history = useHistory();
-  const [input, setInput] = useState(null);
+  const [input, setInput] = useState("");
 
   // Dialog state
   const [open, setOpen] = useState(false);
@@ -83,7 +83,7 @@ export default function Recovery() {
         </Grid>
         <Grid item>
           <Typography>
-            Digite seu e-mail ou nome de usuário para recuperação de conta:
+            Digite seu nome de usuário para recuperação de conta:
           </Typography>
           <TextField 
             variant="outlined"
@@ -91,9 +91,9 @@ export default function Recovery() {
             required
             fullWidth
             id="forgot-input"
-            label="Nome de usuário ou endereço de e-mail para recuperação"
-            name="usernameOrEmail"
-            autoComplete="email"
+            label="Nome de usuário para recuperação"
+            name="username"
+            autoComplete="username"
             autoFocus
             value={input}
             onChange={handleChange}
