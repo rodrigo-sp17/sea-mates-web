@@ -17,6 +17,7 @@ import Calendar from './calendar/Calendar.js';
 import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
 import Shifts from './shifts/Shifts.js';
 import Friends from './friends/Friends.js';
+import Account from 'account/Account.js';
 
 
 const drawerWidth = 240;
@@ -102,6 +103,10 @@ export default function Home() {
     // Helper functions
     const changeTitle = (newTitle) => {
       setTitle(newTitle);
+    }
+
+    const redirectAccount = () => {
+      history.push("/home/account");
     }
 
     const logout = () => {
@@ -210,6 +215,9 @@ export default function Home() {
                         {sessionStorage.getItem("loggedUsername")}
                       </MenuItem>
                       <Divider />
+                      <MenuItem onClick={redirectAccount}>
+                        Minha Conta
+                      </MenuItem>
                       <MenuItem onClick={logout}>
                         Logout
                       </MenuItem>                      
@@ -282,6 +290,9 @@ export default function Home() {
                 </Route>                
                 <Route exact path={match.path}>
                   <Redirect to={`${match.path}/calendar`} />
+                </Route>
+                <Route exact path={`${match.path}/account`}>
+                  <Account changeTitle={changeTitle} />
                 </Route>
               </Switch>
             </main>
