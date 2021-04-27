@@ -1,6 +1,7 @@
 import React from 'react';
 import Home from './Home.js';
 import Login from './auth/Login.js';
+import SocialSignup from './auth/SocialSignup.js';
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,6 +13,7 @@ import Shift from './shifts/Shift.js';
 import Recovery from './auth/Recovery.js';
 import PasswordReset from './auth/PasswordReset.js';
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
+import LoginSuccess from 'auth/LoginSuccess.js';
 
 const theme = createMuiTheme({
   palette: {
@@ -108,6 +110,8 @@ export default function App() {
               <Recovery />
             </Route>
             <Route exact path="/changePassword"><PasswordReset /></Route>
+            <Route exact path="/loginSuccess"><LoginSuccess/></Route>
+            <Route exact path="/socialSignup"><SocialSignup/></Route>
           </Switch>
         </Router>
       </ThemeProvider>

@@ -2,17 +2,26 @@ import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'components/Alert'
-import { Avatar, Button, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
+import { Avatar, Button, Divider, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
+import { Facebook, Instagram } from '@material-ui/icons';
+import { blue } from '@material-ui/core/colors';
 
 
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(6),
+        marginBottom: theme.spacing(3),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+    },
+    social: {
+      marginBottom: theme.spacing(6),
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     form: {
         width: '100%',
@@ -25,6 +34,20 @@ const useStyles = makeStyles((theme) => ({
         width: theme.spacing(14),
         height: theme.spacing(14),
         margin: theme.spacing(1)
+    },
+    fb_button: {
+      marginTop: theme.spacing(2),
+      color: 'white',
+      backgroundColor: blue[900],
+      textTransform: 'none',
+      fontSize: 18
+    },
+    ig_button: {
+      marginTop: theme.spacing(2),
+      color: 'white',
+      textTransform: 'none',
+      backgroundColor: 'purple',
+      fontSize: 18
     }
 }));
 
@@ -119,7 +142,7 @@ export default function Login() {
         await sendLogin();
         setSubmitting(false);
     };
-
+    
     if (sessionStorage.getItem('token') !== null) {
       history.push("/home");
     }
@@ -188,8 +211,20 @@ export default function Login() {
                             ? <Alert severity="success">{successMsg}</Alert>
                             : <Alert severity="error" >{errorMsg}</Alert>
                         }                       
-                </Snackbar>                
-            </div>            
+                </Snackbar>
+            </div>
+            <Divider />
+            <div className={classes.social}>
+              <Button
+                className={classes.fb_button}
+                fullWidth
+                variant='contained'
+                startIcon={<Facebook />}
+                href="oauth2/authorization/facebook"
+              >
+                Continue com Facebook
+              </Button>
+            </div>
         </Container>
     );
 }
