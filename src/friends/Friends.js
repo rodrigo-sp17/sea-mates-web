@@ -10,8 +10,11 @@ import { isAfter, isBefore } from 'date-fns';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: 500,    
+    maxWidth: 800,
+    alignSelf: "center"
   },
+  list: {
+  }
 }));
 
 export default function Friends(props) {
@@ -262,38 +265,33 @@ export default function Friends(props) {
   }
 
   return (
-    <Grid container direction="column" alignItems="stretch">
-      <Grid container direction="column" alignItems="center">
+    <Grid container direction="column" alignItems="stretch" justify="flex-start">
         <List className={classes.root}>
           {requests.map(request => (
             request.sourceUsername === loggedUsername
             ?
-            <ListItem button key={request}> 
-                <ListItemText inset
+            <ListItem alignItems="center" disableGutters button key={request}> 
+                <ListItemText
                   primary={request.targetUsername}
                   secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
                   />                  
-                <ListItemIcon >
-                  <Button edge="end" color="primary">Aguardando aprovação</Button>
-                </ListItemIcon>
-              </ListItem>
+                <Button color="primary">aguardando aprovação</Button>
+            </ListItem>
             :
-            <ListItem button key={request}> 
-                <ListItemText inset
+            <ListItem alignItems="center" disableGutters button key={request}> 
+                <ListItemText
                   primary={request.sourceUsername}
                   secondary={`Requisitado em ${new Date(request.timestamp).toLocaleString()}`}
-                  />    
-                <ListItemIcon>
-                  <Button color="primary" onClick={acceptFriend(request.sourceUsername)}>Aceitar</Button> 
-                </ListItemIcon>
+                />    
+                <Button color="primary" onClick={acceptFriend(request.sourceUsername)}>Aceitar</Button> 
             </ListItem>
           ))}
         </List>
-        <Divider />
+        <Divider className={classes.root} />
         <List className={classes.root}>
           {friends.map(friend => (
-            <ListItem button key={friend}>
-              <ListItemText inset             
+            <ListItem alignItems="center" disableGutters button key={friend}>
+              <ListItemText          
                 primary={friend.userInfo.name}
                 secondary={friend.userInfo.username}
               />
@@ -324,7 +322,6 @@ export default function Friends(props) {
             </ListItem>
           ))}
         </List>
-      </Grid>
       <Grid container justify="flex-end">
         <Fab color="primary" aria-label="add" onClick={toggleDialog('requestDialog', true)}>
           <Add />

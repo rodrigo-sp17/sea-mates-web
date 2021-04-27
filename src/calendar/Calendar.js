@@ -2,12 +2,22 @@ import { React, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
-import { Fab, Grid } from '@material-ui/core';
+import { Fab, Grid, makeStyles } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import EventDialog from './EventDialog';
 
+const useStyles = makeStyles(theme => ({
+  fab: {
+      position: 'fixed',
+      right: '20px',
+      bottom: '20px',
+      zIndex: 100
+  }
+}));
+
 export default function Calendar(props) {
+    const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [clickedDate, setClickedDate] = useState(new Date().toISOString());
 
@@ -77,32 +87,31 @@ export default function Calendar(props) {
 
 
     return (
-        <Grid container spacing={3}>
-            <Grid item>
-                <FullCalendar
-                    plugins={[ dayGridPlugin, interactionPlugin ]}
-                    initialView="dayGridMonth"
-                    selectable={true}
-                    height="auto"
-                    contentHeight="auto"
-                    locale="pt-br"
-                    events={parseEvents(props)}
-                    dateClick={handleDayClick}
-                />
-            </Grid>
-            <Grid container item justify="flex-end">
-                <Fab 
-                    variant="extended"
-                    color="primary" 
-                    aria-label="add"
-                    component={Link}
-                    to="/shift"
-                >
-                    <Add />
-                    Escala
-                </Fab>
-            </Grid>
-            <EventDialog open={open} onClose={closeDialog} date={clickedDate} />
+      <Grid container spacing={3}>
+        <Grid item>
+          <FullCalendar
+            plugins={[ dayGridPlugin, interactionPlugin ]}
+            initialView="dayGridMonth"
+            selectable={true}
+            height="auto"
+            contentHeight="auto"
+            locale="pt-br"
+            events={parseEvents(props)}
+            dateClick={handleDayClick}
+          />
         </Grid>
+          <Fab
+            className={classes.fab} 
+            variant="extended"
+            color="primary" 
+            aria-label="add"
+            component={Link}
+            to="/shift"
+          >
+            <Add />
+            Escala
+          </Fab>
+        <EventDialog open={open} onClose={closeDialog} date={clickedDate} />
+      </Grid>
     );
 }
