@@ -8,7 +8,7 @@ export default function LoginSuccess() {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
     const username = params.get('user');
-    sessionStorage.setItem("token", token);
+    sessionStorage.setItem("token", 'Bearer ' + token);
     sessionStorage.setItem("loggedUsername", username);
 
     history.push("/");
