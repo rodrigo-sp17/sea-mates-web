@@ -14,7 +14,7 @@ export default function EditAccountDialog(props) {
   const validationSchema = yup.object({
     name: yup.string()
       .max(60, "Deve ter 60 caracteres ou menos")
-      .matches(/^[a-zA-Z]+\s[a-zA-Z]+$/, "Nome inválido")
+      .matches(/^([^0-9{}\\/()\]\[]*)$/, "Nome inválido")
       .required("Obrigatório"),
     email: yup.string()
       .email("E-mail inválido")

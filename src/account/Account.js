@@ -131,6 +131,11 @@ export default function Account(props) {
             case 403:
               history.push("/login");
               break;
+            case 409:
+              setSuccess(false);
+              setErrorMsg("O email já existe! Por favor, escolha outro!");
+              showSnack(true);
+              break
             default:
               setSuccess(false);
               setErrorMsg("Erro inesperado do servidor: " + res.status);
