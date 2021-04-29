@@ -125,7 +125,7 @@ export default function SocialSignup() {
                 validationSchema={Yup.object({
                   name: Yup.string()
                     .max(60, "Deve ter 60 caracteres ou menos")
-                    .matches(/^[a-zA-Z]+\s[a-zA-Z]+$/, "Nome inválido")
+                    .matches(/^([^0-9{}\\/()\]\[]*)$/, "Nome inválido")
                     .required("Obrigatório"),
                   username: Yup.string()
                     .min(6, "Mínimo de 6 letras")
