@@ -12,6 +12,7 @@ import logo from 'logo.svg';
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(6),
+    marginBottom: theme.spacing(3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -77,7 +78,7 @@ export default function Signup() {
                 break;
               case 409:
                 setSuccess(false);
-                setMessage("O usuário já existe! Por favor, escolha outro!");
+                setMessage("O usuário ou e-mail já existem! Por favor, escolha outro!");
                 showSnack(true);
                 break;
               case 500:

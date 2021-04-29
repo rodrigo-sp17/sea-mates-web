@@ -86,7 +86,7 @@ export default function SocialSignup() {
                 break;
               case 409:
                 setSuccess(false);
-                setMessage("O usuário já existe! Por favor, escolha outro!");
+                setMessage("O usuário ou e-mail já existem! Por favor, escolha outro!");
                 showSnack(true);
                 break;
               case 500:

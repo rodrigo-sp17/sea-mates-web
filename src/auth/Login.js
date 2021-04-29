@@ -163,10 +163,10 @@ export default function Login() {
                         margin="normal"
                         required
                         fullWidth
-                        label="Nome de Usuário"
+                        label="Nome de Usuário ou Email"
                         name="username"
                         autoFocus
-                        autoComplete="username"
+                        autoComplete="email"
                         value={state.username}
                         onChange={handleChange}
                     />
