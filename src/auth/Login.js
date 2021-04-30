@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
 import { Facebook, Instagram } from '@material-ui/icons';
 import { blue } from '@material-ui/core/colors';
+import jwt_decode from "jwt-decode";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -91,8 +92,10 @@ export default function Login() {
             (res) => {
               switch (res.status) {
                 case 200:
+                  let token = res.headers.get("Authorization").replace("Bearer ", "");
+                  let username = jwt_decode(token).sub;
                   sessionStorage.setItem("token", res.headers.get("Authorization"));
-                  sessionStorage.setItem("loggedUsername", state.username);
+                  sessionStorage.setItem("loggedUsername", username);
                   setSuccess(true);
                   showSnack(true);
                   setTimeout(() => {
