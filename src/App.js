@@ -26,16 +26,16 @@ const theme = createMuiTheme({
       default: "#fafafa"
     },
     primary: {
-      light: "#7986cb",
-      main: "rgba(2, 27, 154, 1)",
-      dark:"#303f9f",
-      contrastText:"#fff"
+      light: "#456da2",
+      main: "#064273",
+      dark:"#001c47",
+      contrastText:"#ffffff"
     },
     secondary: {
-      light: "#ff4081",
-      main: "rgba(182, 128, 2, 1)",
-      dark: "#c51162",
-      contrastText: "#fff"
+      light: "#a8e8f7",
+      main: "#76b6c4",
+      dark: "#458694",
+      contrastText: "#ffffff"
     },
     error: {
       light: "#e57373",
@@ -44,8 +44,8 @@ const theme = createMuiTheme({
       contrastText:"#fff"
     },
     text: {
-      primary: "rgba(0, 0, 0, 0.87)",
-      secondary: "rgba(0, 0, 0, 0.54)",
+      primary: "#000000",
+      secondary: "#000000",
       disabled: "rgba(0, 0, 0, 0.38)",
       hint:"rgba(0, 0, 0, 0.38)"
     }
