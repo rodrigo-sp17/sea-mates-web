@@ -196,11 +196,13 @@ export default function Home() {
                     <Typography variant="h6" className={classes.title}>
                       {title}   
                     </Typography>
+                    {/*
                     <IconButton color="inherit" >
                         <Badge badgeContent={0} color="secondary">
                             <NotificationsIcon />
                         </Badge>
                     </IconButton>
+                    */}
                     <IconButton color="inherit" onClick={handleMenu}>
                       <AccountCircle id="account-circle"/>
                     </IconButton>
@@ -258,6 +260,7 @@ export default function Home() {
                         <ListItemIcon><DateRange /></ListItemIcon>
                         <ListItemText primary="Escalas"/>
                     </ListItem>
+                    {/* 
                     <ListItem button key="events"
                       component={Link}
                       to={`${match.url}/events`}
@@ -265,6 +268,7 @@ export default function Home() {
                         <ListItemIcon><Event /></ListItemIcon>
                         <ListItemText primary="Eventos"/>
                     </ListItem>
+                    */}
                     <ListItem button key="friends"
                       component={Link}
                       to={`${match.url}/friends`}
