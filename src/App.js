@@ -14,6 +14,8 @@ import Recovery from './auth/Recovery.js';
 import PasswordReset from './auth/PasswordReset.js';
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import LoginSuccess from 'auth/LoginSuccess.js';
+import Privacy from 'misc/Privacy.js';
+import ServiceTerms from 'misc/ServiceTerms.js';
 
 const theme = createMuiTheme({
   palette: {
@@ -96,6 +98,12 @@ export default function App() {
             </PrivateRoute> 
             <Route exact path="/login">
               <Login />
+            </Route>
+            <Route exact path="/privacy">
+              <Privacy />
+            </Route>
+            <Route exact path="/terms">
+              <ServiceTerms />
             </Route>
             <Route exact path="/signup">
               <Signup />

@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fab } from '@fortawesome/free-brands-svg-icons'
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'components/Alert'
@@ -9,14 +12,21 @@ import { Facebook, Instagram } from '@material-ui/icons';
 import { blue } from '@material-ui/core/colors';
 import jwt_decode from "jwt-decode";
 
+library.add(fab);
+
 
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(6),
-        marginBottom: theme.spacing(3),
+        marginBottom: theme.spacing(6),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+    },
+    body: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     social: {
       marginBottom: theme.spacing(6),
@@ -29,7 +39,15 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(3),
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(3, 0, 0),
+    },
+    sub_footer: {
+      marginTop: theme.spacing(2),
+    },
+    legal: {
+      marginTop: theme.spacing(6),
+      flexDirection: "column",
+      alignItems: 'center',
     },
     logo: {
         width: theme.spacing(14),
@@ -39,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     fb_button: {
       marginTop: theme.spacing(2),
       color: 'white',
-      backgroundColor: blue[900],
+      backgroundColor: '#1877F2',
       textTransform: 'none',
       fontSize: 18
     },
@@ -69,11 +87,19 @@ export default function Login() {
     const [snack, showSnack] = useState(false);
 
     const redirectSignup = () => {
-        history.push('/signup');
+      history.push('/signup');
     }
 
-    const redirectRecovery =() => {
-        history.push('/recovery');
+    const redirectRecovery = () => {
+      history.push('/recovery');
+    }
+
+    const redirectPrivacy = () => {
+      history.push('/privacy');
+    }
+
+    const redirectTerms = () => {
+      history.push('/terms')
     }
 
     const sendLogin = async () => {
@@ -151,8 +177,8 @@ export default function Login() {
     }
     
     return(
-        <Container component="main" maxWidth="xs">
-            <div className={classes.paper}>
+        <Container component="main" maxWidth="xs" className={classes.paper}>
+            <div className={classes.body}>
                 <Avatar
                     className={classes.logo}
                     src={logo}
@@ -196,19 +222,28 @@ export default function Login() {
                     >
                         Entrar
                     </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2" onClick={redirectRecovery}>
-                                Esqueceu sua senha?
-                            </Link>
-                        </Grid>
-                        <Grid item>
-                            <Link href="#" variant="body2" onClick={redirectSignup}>
-                                {"Não tem uma conta? Cadastre-se!"}
-                            </Link>
-                        </Grid>
-                    </Grid>
                 </form>
+                <Button
+                  className={classes.fb_button}
+                  fullWidth
+                  variant='contained'
+                  startIcon={<FontAwesomeIcon icon={['fab', 'facebook']} />}
+                  href="oauth2/authorization/facebook"
+                >
+                  Continue com Facebook
+                </Button>
+                <Grid container className={classes.sub_footer}>
+                    <Grid item xs>
+                        <Link href="#" variant="body2" onClick={redirectRecovery}>
+                            Esqueceu sua senha?
+                        </Link>
+                    </Grid>
+                    <Grid item>
+                        <Link href="#" variant="body2" onClick={redirectSignup}>
+                            {"Não tem uma conta? Cadastre-se!"}
+                        </Link>
+                    </Grid>
+                </Grid>
                 <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
                         {loginSuccess
                             ? <Alert severity="success">{successMsg}</Alert>
@@ -217,17 +252,18 @@ export default function Login() {
                 </Snackbar>
             </div>
             <Divider />
-            <div className={classes.social}>
-              <Button
-                className={classes.fb_button}
-                fullWidth
-                variant='contained'
-                startIcon={<Facebook />}
-                href="oauth2/authorization/facebook"
-              >
-                Continue com Facebook
-              </Button>
-            </div>
+            <Grid container spacing={1} className={classes.legal}>
+              <Grid item xs>
+                <Link href="" variant="body2" onClick={redirectPrivacy}>
+                  Política de Privacidade
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href="" variant="body2" onClick={redirectTerms}>
+                  Termos de Serviço
+                </Link>
+              </Grid>
+          </Grid>
         </Container>
     );
 }
