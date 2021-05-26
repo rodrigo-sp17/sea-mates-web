@@ -19,6 +19,8 @@ import Shifts from './shifts/Shifts.js';
 import Friends from './friends/Friends.js';
 import Account from 'account/Account.js';
 
+import { EventSourcePolyfill } from 'event-source-polyfill';
+
 
 const drawerWidth = 240;
 
@@ -95,10 +97,15 @@ export default function Home() {
 
     // Menu state
     const [anchorEl, setAnchorEl] = useState(null);
+    const [notifAnchorEl, setNotifAnchorEl] = useState(null);
 
     // Shifts state
     const [isLoaded, setIsLoaded] = useState(false);
     const [shifts, setShifts] = useState([]);
+
+    // Notifications state
+    const [notifications, setNotifications] = useState([]);
+    const [newNotifications, setNewNotifications] = useState(0);
 
     // Helper functions
     const changeTitle = (newTitle) => {
@@ -153,28 +160,67 @@ export default function Home() {
       );
     }
 
+    const subscribePush = () => {
+      const username = sessionStorage.getItem('loggedUsername');
+      const token = sessionStorage.getItem('token');
+      var es = new EventSourcePolyfill(
+        '/api/push/subscribe/' + username,
+        {
+          headers: {
+            "Authorization": token,
+          }
+        }
+        );
+      
+      es.onerror = () => es.close();
+      es.addEventListener("FRIEND_REQUEST", e => handleFriendRequestEvent(e));
+    }
+
+    const handleFriendRequestEvent = function (event) {
+      const username = sessionStorage.getItem("loggedUsername");
+      const data = JSON.parse(event.data);
+      const source = data.source;
+      if (source !== username) {
+        var note  = `${source} solicitou sua amizade!`;
+        console.log(note);
+        var newNotifs = notifications.concat(note);
+        setNotifications(newNotifs);
+        console.log(newNotifs);
+        console.log(notifications);
+        setNewNotifications(newNotifications + 1);
+      }
+    }    
+
+    useEffect(() => {
+      subscribePush();
+    }, []);    
+    
     useEffect(() => {
       fetchShifts();
       setIsLoaded(true);
     }, [isLoaded]);
 
-
     // Drawer handler
     const toggleDrawer = (open) => (event) => {
       if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
           return;
-      }
-      
+      }      
       setOpen(open);
     }
 
-    // Account menu handlers
-    const handleMenu = (event) => {
+    // Menu handlers
+    const handleMenuOpen = (event) => {
       setAnchorEl(event.currentTarget);
+    }
+
+    const handleNotifMenuOpen = (event) => {
+      setNotifAnchorEl(event.currentTarget);
+      setNewNotifications(0);
     }
 
     const handleMenuClose = () => {
       setAnchorEl(null);
+      setNotifAnchorEl(null);
     }
 
     return (
@@ -185,27 +231,37 @@ export default function Home() {
             >
                 <Toolbar>
                     <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="open menu"
-                        onClick={toggleDrawer(true)}
-                        className={clsx(classes.menuButton, open && classes.hide)}
+                      edge="start"
+                      color="inherit"
+                      aria-label="open menu"
+                      onClick={toggleDrawer(true)}
+                      className={clsx(classes.menuButton, open && classes.hide)}
                     >
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
                       {title}   
                     </Typography>
-                    {/*
-                    <IconButton color="inherit" >
-                        <Badge badgeContent={0} color="secondary">
-                            <NotificationsIcon />
-                        </Badge>
+                    <IconButton onClick={handleNotifMenuOpen} color="inherit">
+                      <Badge 
+                        badgeContent={newNotifications}
+                        color="error"
+                        >
+                          <NotificationsIcon />
+                      </Badge>
                     </IconButton>
-                    */}
-                    <IconButton color="inherit" onClick={handleMenu}>
+                    <IconButton color="inherit" onClick={handleMenuOpen}>
                       <AccountCircle id="account-circle"/>
                     </IconButton>
+                    <Menu
+                      id="menu-notifications"
+                      anchorEl={notifAnchorEl}
+                      keepMounted
+                      open={Boolean(notifAnchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      {notifications.map((notif, index) => <MenuItem key={index}>{notif}</MenuItem>)}
+                    </Menu>
                     <Menu 
                       id="menu-account"
                       anchorEl={anchorEl}
@@ -302,4 +358,8 @@ export default function Home() {
             </main>
           </div>
     );
+}
+
+function Notification() {
+  
 }
