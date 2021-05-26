@@ -92,6 +92,7 @@ export default function Friends(props) {
     }
 
     setLoadedRequests(false);
+    setLoadedFriends(false);
 
     // Closes dialog
     setOpen({ ...open, requestDialog: false});
@@ -311,7 +312,7 @@ export default function Friends(props) {
                   Deseja desfazer a amizade?
                 </DialogTitle>
                 <DialogActions>
-                  <Button autoFocus color="primary" onClick={unfriend(friend)}>
+                  <Button autoFocus color="primary" onClick={unfriend(friend.userInfo.username)}>
                     Aceitar
                   </Button>
                   <Button color="primary" onClick={toggleDialog('deleteDialog', false)}>
