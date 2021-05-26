@@ -182,11 +182,8 @@ export default function Home() {
       const source = data.source;
       if (source !== username) {
         var note  = `${source} solicitou sua amizade!`;
-        console.log(note);
         var newNotifs = notifications.concat(note);
         setNotifications(newNotifs);
-        console.log(newNotifs);
-        console.log(notifications);
         setNewNotifications(newNotifications + 1);
       }
     }    
