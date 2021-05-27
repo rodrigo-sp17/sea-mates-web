@@ -174,6 +174,7 @@ export default function Home() {
       
       es.onerror = () => es.close();
       es.addEventListener("FRIEND_REQUEST", e => handleFriendRequestEvent(e));
+      es.addEventListener("FRIEND_ACCEPT", e => handleFriendAcceptEvent(e));
     }
 
     const handleFriendRequestEvent = function (event) {
@@ -186,7 +187,19 @@ export default function Home() {
         setNotifications(newNotifs);
         setNewNotifications(newNotifications + 1);
       }
-    }    
+    }
+
+    const handleFriendAcceptEvent = function (event) {
+      const username = sessionStorage.getItem("loggedUsername");
+      const data = JSON.parse(event.data);
+      const source = data.source;
+      if (source !== username) {
+        var note  = `${source} aceitou sua solicitação!`;
+        var newNotifs = notifications.concat(note);
+        setNotifications(newNotifs);
+        setNewNotifications(newNotifications + 1);
+      }
+    }
 
     useEffect(() => {
       subscribePush();
