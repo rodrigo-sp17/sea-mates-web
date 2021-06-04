@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@material-ui/core";
 
 
-export default function EditAccountDialog(props) {
+export default function EditAccountDialog(props: any) {
   const { onClose, open, user } = props;
 
   const cancel = () => {
@@ -69,7 +69,7 @@ export default function EditAccountDialog(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={cancel}>Cancelar</Button>
-          <Button onClick={formik.handleSubmit}>Salvar</Button>
+          <Button onClick={(_) => formik.handleSubmit}>Salvar</Button>
         </DialogActions>
       </Dialog>
     </Grid>

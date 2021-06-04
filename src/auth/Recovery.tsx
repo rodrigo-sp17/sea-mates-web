@@ -45,7 +45,7 @@ export default function Recovery() {
     history.push('/login');
   }
 
-  const handleChange = (event) => {
+  const handleChange = (event : any) => {
     setInput(event.target.value);
   }
 

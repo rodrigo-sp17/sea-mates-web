@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import Alert from 'components/Alert.js';
+import Alert from 'components/Alert';
 import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
+import Shift from 'data/shift';
 
-export default function Shifts(props) {
+export default function Shifts(props: any) {
     const history = useHistory();
     
     // Shift selection state (through checkbox)
@@ -25,7 +26,7 @@ export default function Shifts(props) {
     // Shift deletion state
     const successDeleteMsg = "Escala(s) deletada(s)!";
     
-    const deleteShift = (event) => {
+    const deleteShift = (event: any) => {
         event.preventDefault();
         //validate();
 
@@ -42,7 +43,7 @@ export default function Shifts(props) {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8',
-                    'Authorization': sessionStorage.getItem("token")
+                    'Authorization': sessionStorage.getItem("token") || ""
                 }
             })
             .then(res => {
@@ -75,7 +76,7 @@ export default function Shifts(props) {
 
 
     // Handles the toggling of list items
-    const handleToggle = (shift) => () => {
+    const handleToggle = (shift: Shift) => () => {
         const currentIndex = checked.indexOf(shift.shiftId);
         const newChecked = [...checked];
 
@@ -94,8 +95,8 @@ export default function Shifts(props) {
         <Grid container direction="column" alignItems="stretch">
             <Grid container justify="center">
                 <List>
-                    {props.shifts === null ? [] : props.shifts.map(shift => (
-                        <ListItem key={shift} button onClick={handleToggle(shift)}>
+                    {props.shifts === null ? [] : props.shifts.map((shift: Shift) => (
+                        <ListItem key={shift.shiftId} button onClick={handleToggle(shift)}>
                             <ListItemIcon>
                                 <Checkbox
                                     edge="start"

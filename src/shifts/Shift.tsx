@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     },  
   }));
 
-export default function Shift(props) {
+export default function Shift(props: any) {
     const classes = useStyles();
     const history = useHistory();
     
@@ -62,32 +62,32 @@ export default function Shift(props) {
     const [shiftSuccess, setSuccess] = useState(false);
     
     // Shift state
-    const [unavailableDate, setUnavailableDate] = useState(new Date());
-    const [boardingDate, setBoardingDate] = useState(new Date());
-    const [leavingDate, setLeavingDate] = useState(new Date());
-    const [availableDate, setAvailableDate] = useState(new Date());
+    const [unavailableDate, setUnavailableDate] = useState<any>(new Date());
+    const [boardingDate, setBoardingDate] = useState<any>(new Date());
+    const [leavingDate, setLeavingDate] = useState<any>(new Date());
+    const [availableDate, setAvailableDate] = useState<any>(new Date());
     const [cycleDays, setCycleDays] = useState(0);
     const [useCycle, setUseCycle] = useState(false);
     const [repeat, setRepeat] = useState(0);
   
     // Handlers
-    const handleUseCycle = (event) => {
+    const handleUseCycle = (event: any) => {
         let checked = event.target.checked;
         setUseCycle(checked);
     }
 
-    const handleLeavingDate = (date) => {
+    const handleLeavingDate = (date: any) => {
         setLeavingDate(date);
         if (!useCycle) {
             setCycleDays(differenceInCalendarDays(date, boardingDate));
         }
     }
 
-    const handleRepeat = (event) => {
+    const handleRepeat = (event: any) => {
         setRepeat(event.target.value);
     }
 
-    const handleCycleDays = (event) =>  {
+    const handleCycleDays = (event: any) =>  {
         let days = event.target.value;
         if (days < 0) days = 0;
 
@@ -99,12 +99,12 @@ export default function Shift(props) {
         setAvailableDate(newDate);        
     }
 
-    const calculateCycle = (cycleValue) => {
+    const calculateCycle = (cycleValue: number) => {
         const result = addDays(boardingDate, cycleValue);       
         return result;
     }
 
-    const submit = (event) => {
+    const submit = (event: any) => {
         event.preventDefault();
         validate();
 
@@ -112,7 +112,7 @@ export default function Shift(props) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
-                'Authorization': sessionStorage.getItem("token")
+                'Authorization': sessionStorage.getItem("token") || ""
             },
             body: JSON.stringify({
                 "unavailabilityStartDate": unavailableDate,
@@ -241,7 +241,8 @@ export default function Shift(props) {
                     />                          
                 </MuiPickersUtilsProvider>
                 <Grid container direction="row" className={classes.formItems}>
-                    <FormControlLabel       
+                    <FormControlLabel
+                        label= ""    
                         control={
                         <Switch
                             checked={useCycle} 

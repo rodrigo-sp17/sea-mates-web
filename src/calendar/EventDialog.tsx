@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, List, ListItem, ListItemText, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
@@ -9,19 +9,19 @@ EventDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function EventDialog(props) {
+export default function EventDialog(props: any) {
   const { open, onClose, date } = props;
   const parsedDate = new Date(date);
   const history = useHistory();
 
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState<any>([]);
   const [loaded, setLoaded] = useState(false);
 
   const fetchAvailableFriends = () => {
     fetch("/api/calendar/available?date=" + parsedDate.toISOString().substr(0, 10), {
       method: 'GET',
       headers: {
-        'Authorization': sessionStorage.getItem('token')
+        'Authorization': sessionStorage.getItem('token') || ""
       }
     })
     .then(res => {
@@ -69,7 +69,7 @@ export default function EventDialog(props) {
               ? <Typography variant="h6">Nenhum amigo disponível</Typography>
               : 
                 <List disablePadding>
-                  {friends.map(friend => (
+                  {friends.map((friend: any) => (
                     <ListItem dense key={friend}>
                       <ListItemText primary={friend.userInfo.name} />
                     </ListItem>

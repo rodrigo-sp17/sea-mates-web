@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, FormEvent, SyntheticEvent, useState } from "react";
 import PropTypes from 'prop-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField } from "@material-ui/core";
 
-export default function DeleteAccountDialog(props) {
+export default function DeleteAccountDialog(props: any) {
   const { onClose, open } = props;
   const [password, setPassword] = useState("");
 
@@ -14,7 +14,7 @@ export default function DeleteAccountDialog(props) {
     onClose("");
   }
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setPassword(event.target.value);
   }
 

@@ -38,7 +38,7 @@ export default function PasswordReset() {
   const token = new URLSearchParams(location.search).get("reset");
   
   // Form state
-  const [formState, setState] = useState({
+  const [formState, setState] = useState<any>({
     username: "",
     password: "",
     confirm: "",
@@ -58,7 +58,7 @@ export default function PasswordReset() {
     await fetch("/api/user/resetPassword", {
       method: 'POST',
       headers: {
-        "reset": token,
+        "reset": token || "",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({

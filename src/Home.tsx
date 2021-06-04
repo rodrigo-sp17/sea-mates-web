@@ -1,4 +1,4 @@
-import {React, useEffect, useState} from 'react';
+import React, { SyntheticEvent, useEffect, useState} from 'react';
 import clsx from 'clsx';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,11 +13,11 @@ import Drawer from '@material-ui/core/Drawer';
 import { Divider, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core';
 import { AccountCircle, CalendarToday, ChevronLeft, DateRange, Event, People } from '@material-ui/icons';
 
-import Calendar from './calendar/Calendar.js';
+import Calendar from 'calendar/Calendar';
 import { Link, Route, Switch, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
-import Shifts from './shifts/Shifts.js';
-import Friends from './friends/Friends.js';
-import Account from 'account/Account.js';
+import Shifts from 'shifts/Shifts';
+import Friends from 'friends/Friends';
+import Account from 'account/Account';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
@@ -96,19 +96,19 @@ export default function Home() {
     const [open, setOpen] = useState(false);
 
     // Menu state
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+    const [notifAnchorEl, setNotifAnchorEl] = useState<Element | null>(null);
 
     // Shifts state
     const [isLoaded, setIsLoaded] = useState(false);
     const [shifts, setShifts] = useState([]);
 
     // Notifications state
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState<string[]>([]);
     const [newNotifications, setNewNotifications] = useState(0);
 
     // Helper functions
-    const changeTitle = (newTitle) => {
+    const changeTitle = (newTitle: string) => {
       setTitle(newTitle);
     }
 
@@ -128,10 +128,11 @@ export default function Home() {
     }
 
     const fetchShifts = () => {
+      const token = sessionStorage.getItem("token") || "";
       fetch("/api/shift", {
         method: 'GET',
         headers: {          
-          'Authorization': sessionStorage.getItem("token")
+          'Authorization': token
         }
       })
       .then(res => {
@@ -139,10 +140,9 @@ export default function Home() {
           history.push("/login");
           return new Error("User not logged");
         } else if (res.ok) {
-          return res;
+          return res.json();
         }
       })
-      .then(res => res.json())
       .then(
         (result) => {
           const newShifts = result._embedded;
@@ -173,11 +173,11 @@ export default function Home() {
         );
       
       es.onerror = () => es.close();
-      es.addEventListener("FRIEND_REQUEST", e => handleFriendRequestEvent(e));
-      es.addEventListener("FRIEND_ACCEPT", e => handleFriendAcceptEvent(e));
+      es.addEventListener("FRIEND_REQUEST", (e: any) => handleFriendRequestEvent(e));
+      es.addEventListener("FRIEND_ACCEPT", (e: any) => handleFriendAcceptEvent(e));
     }
 
-    const handleFriendRequestEvent = function (event) {
+    const handleFriendRequestEvent = function (event: any) {
       const username = sessionStorage.getItem("loggedUsername");
       const data = JSON.parse(event.data);
       const source = data.source;
@@ -189,7 +189,7 @@ export default function Home() {
       }
     }
 
-    const handleFriendAcceptEvent = function (event) {
+    const handleFriendAcceptEvent = function (event: any) {
       const username = sessionStorage.getItem("loggedUsername");
       const data = JSON.parse(event.data);
       const source = data.source;
@@ -211,19 +211,16 @@ export default function Home() {
     }, [isLoaded]);
 
     // Drawer handler
-    const toggleDrawer = (open) => (event) => {
-      if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-          return;
-      }      
+    const toggleDrawer = (open: boolean) => (event: SyntheticEvent) => {
       setOpen(open);
     }
 
     // Menu handlers
-    const handleMenuOpen = (event) => {
+    const handleMenuOpen = (event: SyntheticEvent) => {
       setAnchorEl(event.currentTarget);
     }
 
-    const handleNotifMenuOpen = (event) => {
+    const handleNotifMenuOpen = (event: SyntheticEvent) => {
       setNotifAnchorEl(event.currentTarget);
       setNewNotifications(0);
     }

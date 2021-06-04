@@ -1,4 +1,4 @@
-import {React, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {useHistory} from 'react-router-dom';
 import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, Chip } from '@material-ui/core';
@@ -6,6 +6,7 @@ import { Add, RemoveCircleOutline} from '@material-ui/icons';
 import Alert from '../components/Alert';
 import RequestDialog from './RequestDialog';
 import { isAfter, isBefore } from 'date-fns';
+import Shift from 'data/shift';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Friends(props) {
+export default function Friends(props: any) {
   const classes = useStyles();
   const history = useHistory();
 
@@ -48,12 +49,12 @@ export default function Friends(props) {
   }, [])
   
   // API interaction functions
-  const requestFriendship = (username) => {
+  const requestFriendship = (username: string) => {
     if (username !== null && username !== "") {
       fetch("/api/friend/request?username=" + username, {
         method: 'POST',
         headers: {
-          'Authorization': sessionStorage.getItem('token')
+          'Authorization': sessionStorage.getItem('token') || ""
         }
       })
       .then(
@@ -98,11 +99,11 @@ export default function Friends(props) {
     setOpen({ ...open, requestDialog: false});
   }
 
-  const acceptFriend = (username) => (event) => {
+  const acceptFriend = (username: string) => () => {
     fetch("/api/friend/accept?username=" + username, {
       method: 'POST',
       headers: {
-        'Authorization': sessionStorage.getItem('token')
+        'Authorization': sessionStorage.getItem('token') || ""
       }
     })
     .then(
@@ -133,11 +134,11 @@ export default function Friends(props) {
     setLoadedRequests(false);
   }
   
-  const unfriend = (username) => (event) => {
+  const unfriend = (username: string) => () => {
     fetch("/api/friend/remove?username=" + username, {
       method: 'DELETE',
       headers: {
-        'Authorization': sessionStorage.getItem('token')
+        'Authorization': sessionStorage.getItem('token') || ""
       }
     })
     .then(
@@ -176,12 +177,12 @@ export default function Friends(props) {
     fetch("/api/friend", {
       method: 'GET',
       headers: {
-        'Authorization': sessionStorage.getItem('token')
+        'Authorization': sessionStorage.getItem('token') || ""
       }
     })
     .then(res => {
       if (res.ok) {
-        return res;
+        return res.json();
       } else if (res.status === 403) {
         history.push("/login");
         return new Error("Forbidden");        
@@ -189,7 +190,6 @@ export default function Friends(props) {
         return new Error('Unexpected response status: ' + res.status);
       }
     })
-    .then(res => res.json())
     .then(
       (result) => {
         const newFriends = result._embedded;
@@ -210,7 +210,7 @@ export default function Friends(props) {
     fetch('/api/friend/request', {
       method: 'GET',
       headers: {
-        'Authorization': sessionStorage.getItem('token')
+        'Authorization': sessionStorage.getItem('token') || ""
       }
     })
     .then(res => {
@@ -221,7 +221,7 @@ export default function Friends(props) {
           history.push('/login');
           return new Error("User not logged");
         default:
-          return new Error(res);
+          return new Error("Something went wrong with the server");
       }
     })
     .then(
@@ -250,12 +250,12 @@ export default function Friends(props) {
     setLoadedRequests(true);
   }, [loadedRequests])
   
-  const toggleDialog = (dialog, open) => (event) => {
+  const toggleDialog = (dialog: any, open: any) => (event: any) => {
     setOpen({ ...open, [dialog]: open });
   }
   
   // Returns true if today is outside the shifts, or false if it is inside
-  const isAvailableNow = (shifts) => {
+  const isAvailableNow = (shifts: Shift[]) => {
     const now = Date.now();
     return shifts.every((shift) => {
       const startDate = new Date(shift.unavailabilityStartDate);
@@ -268,7 +268,7 @@ export default function Friends(props) {
   return (
     <Grid container direction="column" alignItems="stretch" justify="flex-start">
         <List className={classes.root}>
-          {requests.map(request => (
+          {requests.map((request: any) => (
             request.sourceUsername === loggedUsername
             ?
             <ListItem alignItems="center" disableGutters button key={request}> 
@@ -290,7 +290,7 @@ export default function Friends(props) {
         </List>
         <Divider className={classes.root} />
         <List className={classes.root}>
-          {friends.map(friend => (
+          {friends.map((friend: any) => (
             <ListItem alignItems="center" disableGutters button key={friend}>
               <ListItemText          
                 primary={friend.userInfo.name}
@@ -302,7 +302,7 @@ export default function Friends(props) {
                 : <Chip color="secondary" label="Embarcado" />
                 }
               </ListItemText>
-              <ListItemIcon edge="end">
+              <ListItemIcon>
                 <IconButton onClick={toggleDialog('deleteDialog', true)}>
                   <RemoveCircleOutline color="error" />
                 </IconButton>

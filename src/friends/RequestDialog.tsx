@@ -1,12 +1,12 @@
-import { React, useState } from 'react';
+import React,{ useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField } from '@material-ui/core';
 
-export default function RequestDialog(props) {
+export default function RequestDialog(props: any) {
   const { onClose, open } = props;
   const [username, setUsername] = useState("");
   
-  const submit = (event) => {
+  const submit = (event: any) => {
     onClose(username);
   }
 
@@ -14,7 +14,7 @@ export default function RequestDialog(props) {
     onClose("");
   }
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setUsername(event.target.value);
   }
 

@@ -1,21 +1,21 @@
 import React from 'react';
-import Home from './Home.js';
-import Login from './auth/Login.js';
-import SocialSignup from './auth/SocialSignup.js';
+import Home from 'Home';
+import Login from 'auth/Login';
+import SocialSignup from 'auth/SocialSignup';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect
 } from "react-router-dom";
-import Signup from './auth/Signup.js';
-import Shift from './shifts/Shift.js';
-import Recovery from './auth/Recovery.js';
-import PasswordReset from './auth/PasswordReset.js';
+import Signup from 'auth/Signup';
+import Shift from 'shifts/Shift';
+import Recovery from 'auth/Recovery';
+import PasswordReset from 'auth/PasswordReset';
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
-import LoginSuccess from 'auth/LoginSuccess.js';
-import Privacy from 'misc/Privacy.js';
-import ServiceTerms from 'misc/ServiceTerms.js';
+import LoginSuccess from 'auth/LoginSuccess';
+import Privacy from 'misc/Privacy';
+import ServiceTerms from 'misc/ServiceTerms';
 
 const theme = createMuiTheme({
   palette: {
@@ -55,14 +55,14 @@ const theme = createMuiTheme({
   typography: {
     button: {
       fontSize: "1rem",
-      fontWeight: "500",
+      fontWeight: 500,
       letterSpacing: "0.02857em"
     }
   }
 })
 
 
-function PrivateRoute({ children, ...rest }) {
+function PrivateRoute({ children, ...rest }: any) {
   let auth = sessionStorage.getItem('token');
   return (
     <Route

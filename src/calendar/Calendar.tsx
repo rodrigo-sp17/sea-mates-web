@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
@@ -6,6 +6,7 @@ import { Fab, Grid, makeStyles } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import EventDialog from './EventDialog';
+import Shift from 'data/shift';
 
 const useStyles = makeStyles(theme => ({
   fab: {
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Calendar(props) {
+export default function Calendar(props: any) {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [clickedDate, setClickedDate] = useState(new Date().toISOString());
@@ -26,7 +27,7 @@ export default function Calendar(props) {
     }
 
     // Handlers
-    const handleDayClick = (info) => {
+    const handleDayClick = (info: any) => {
         setClickedDate(info.dateStr);
         setOpen(true);
     }
@@ -38,8 +39,8 @@ export default function Calendar(props) {
 
     // Parses Shift objects to FullCalendars's Event objects
     // Shifts are assumed to always be a Shift array/list
-    const parseEvents = (props) => {
-        var events = props.shifts.map(shift => {            
+    const parseEvents = (props: any) => {
+        var events = props.shifts.map((shift: Shift) => {            
             var unavailable = {
                 id: shift.shiftId,
                 title: "Pré-embarque",

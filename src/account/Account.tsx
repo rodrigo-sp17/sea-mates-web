@@ -4,6 +4,7 @@ import { useHistory } from 'react-router';
 import DeleteAccountDialog from './DeleteAccountDialog';
 import Alert from 'components/Alert';
 import EditAccountDialog from './EditAccountDialog';
+import User from 'data/user';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -28,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 
-export default function Account(props) {
+export default function Account(props: any) {
   const classes = useStyles();
   const history = useHistory();
 
@@ -41,12 +42,7 @@ export default function Account(props) {
     deleteDialog: false,
   });
 
-  const [user, setUser] = useState({
-    userId: "",
-    name: "",
-    username: "",
-    email: ""
-  });
+  const [user, setUser] = useState(new User());
 
   // Snack state
   const [snack, showSnack] = useState(false);
@@ -60,16 +56,18 @@ export default function Account(props) {
   }, []);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token") || "";
+
     fetch("/api/user/me", {
       method: "GET",
       headers: {
-        "Authorization": sessionStorage.getItem("token"),
+        "Authorization": token,
       }
     }).then(
       (res) => {
         switch (res.status) {
           case 200:
-            return res;
+            return res.json();
           case 403:
             history.push("/login");
             return;
@@ -85,7 +83,6 @@ export default function Account(props) {
         showSnack(true);
       }
     )
-    .then(res => res.json())
     .then(
       (res) => {
         setUser({
@@ -104,14 +101,15 @@ export default function Account(props) {
     setIsLoaded(true);
   }, [isLoaded])
 
-  const editAccount = async (newUser) => {
+  const editAccount = async (newUser: User) => {
     if (newUser !== null) {
       setSubmitting(true);
       
+      const token = sessionStorage.getItem("token") || "";      
       await fetch("/api/user", {
         method: "PUT",
         headers: {
-          "Authorization": sessionStorage.getItem('token'),
+          "Authorization": token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -155,14 +153,16 @@ export default function Account(props) {
     setOpen({...open, editDialog: false})
   }
   
-  const deleteAccount = async (password) => {
+  const deleteAccount = async (password: string) => {
     if (password !== null || password !== "") {
       setDeleting(true);
+      
+      const token = sessionStorage.getItem("token") || "";      
 
       await fetch("/api/user/delete", {
         method: "DELETE",
         headers: {
-          "Authorization": sessionStorage.getItem("token"),
+          "Authorization": token,
           "Password": password 
         }
       })
@@ -266,7 +266,7 @@ export default function Account(props) {
           fullWidth   
           className={classes.deleteButton}
           variant="contained"
-          color="error"
+          color="secondary"
           onClick={openDeleteDialog}
         >
           Apagar Conta

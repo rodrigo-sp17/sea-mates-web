@@ -104,7 +104,7 @@ export default function Login() {
 
     const sendLogin = async () => {
         const url = "/login";
-        const options = {
+        const options : RequestInit = {
             method: 'POST',
             mode: 'no-cors',              
             body: JSON.stringify({
@@ -118,9 +118,14 @@ export default function Login() {
             (res) => {
               switch (res.status) {
                 case 200:
-                  let token = res.headers.get("Authorization").replace("Bearer ", "");
-                  let username = jwt_decode(token).sub;
-                  sessionStorage.setItem("token", res.headers.get("Authorization"));
+                  let bearerToken = res.headers.get("Authorization");
+                  if (bearerToken == null) {
+                    throw Error("Expected token on header");
+                  }
+
+                  let token = bearerToken.replace("Bearer ", "");
+                  let username = (jwt_decode(token) as any).sub;
+                  sessionStorage.setItem("token", bearerToken);
                   sessionStorage.setItem("loggedUsername", username);
                   setSuccess(true);
                   showSnack(true);
@@ -156,7 +161,7 @@ export default function Login() {
         )            
     };
 
-    const handleChange = (event) => {
+    const handleChange = (event: any) => {
       const name = event.target.name;
       const value = event.target.value;
       setState({
@@ -165,7 +170,7 @@ export default function Login() {
       });
     }
       
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: any) => {
         event.preventDefault();
         setSubmitting(true);
         await sendLogin();

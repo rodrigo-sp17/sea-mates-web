@@ -9,7 +9,7 @@ export default function LoginSuccess() {
     const token = params.get('token');
     const username = params.get('user');
     sessionStorage.setItem("token", 'Bearer ' + token);
-    sessionStorage.setItem("loggedUsername", username);
+    sessionStorage.setItem("loggedUsername", username || "");
 
     history.push("/");
     return null;

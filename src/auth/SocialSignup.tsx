@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Alert from '../components/Alert';
-import { Link, useHistory } from 'react-router-dom';
-import { Avatar, Button, Grid, LinearProgress, makeStyles, Snackbar, Typography } from '@material-ui/core';
+import { useHistory, useLocation } from 'react-router-dom';
+import { Avatar, Button, Grid, LinearProgress, Link, makeStyles, Snackbar, Typography } from '@material-ui/core';
 import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
@@ -12,7 +12,6 @@ import logo from 'logo.svg';
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(6),
-    marginBottom: theme.spacing(3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -32,9 +31,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Signup() {    
+export default function SocialSignup() {    
     const classes = useStyles();
     const history = useHistory();
+    const location = useLocation();
+
+    const params = new URLSearchParams(location.search);
+    const name = params.get('name');
+    const email = params.get('email');
+    const socialId = params.get('socialId');
+    const registrationId = params.get('registrationId');
     
     // Dialog state
     const[message, setMessage] = useState("Erro crítico!");
@@ -45,8 +51,8 @@ export default function Signup() {
       history.push("/login");
     }
     
-    const sendSignup =  async (values) => {
-        const url = "/api/user/signup";
+    const sendSignup =  async (values: any) => {
+        const url = "/api/user/socialSignup";
         const options = {
             method: 'POST',
             headers: { 
@@ -56,8 +62,8 @@ export default function Signup() {
                 name: values.name,
                 email: values.email,                
                 username: values.username,
-                password: values.password,
-                confirmPassword: values.confirmPassword
+                socialId: socialId,
+                registrationId: registrationId
             })
         };
         
@@ -66,10 +72,12 @@ export default function Signup() {
           (res) => {
             switch (res.status) {
               case 201:
+                sessionStorage.setItem("token", res.headers.get("Authorization") || "");
+                sessionStorage.setItem("loggedUsername", values.username);
                 setSuccess(true);
-                setMessage("Usuário criado com sucesso! Redirecionando para login...")
+                setMessage("Usuário criado com sucesso! Redirecionando...")
                 showSnack(true);
-                setTimeout(() => { history.push('/login'); }, 2000);
+                setTimeout(() => { history.push('/'); }, 2000);
                 break;
               case 400:
                 setSuccess(false);
@@ -83,7 +91,7 @@ export default function Signup() {
                 break;
               case 500:
                 setSuccess(false);
-                setMessage("Erro inesperado do servidor! - 500");
+                setMessage("Erro inesperado do servidor - 500");
                 showSnack(true);
                 break;
               default:
@@ -110,7 +118,10 @@ export default function Signup() {
                   Cadastrar novo usuário
               </Typography>
               <Formik
-                initialValues={{}}
+                initialValues={{
+                  name: name,
+                  email: email,
+                }}
                 validationSchema={Yup.object({
                   name: Yup.string()
                     .max(60, "Deve ter 60 caracteres ou menos")
@@ -123,14 +134,6 @@ export default function Signup() {
                   email: Yup.string()
                     .email("E-mail inválido")
                     .required("Obrigatório"),
-                  password: Yup.string()
-                    .min(8, "Mínimo de 8 caracteres")
-                    .max(64, "Máximo de 64 caracteres")
-                    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[*.!@$%#^&(){}\[\]:;<>,.?~+-/|/=/\\]).*$/, "Senha deve ter maiúsculas, minúsculas, números e caracteres especiais")
-                    .required("Obrigatório"),
-                  confirmPassword: Yup.string()
-                    .oneOf([Yup.ref('password'), null], 'Senha e confirmação não são iguais')
-                    .required("Obrigatório")
                 })}
                 onSubmit={async (values, { setSubmitting } ) => {
                   await sendSignup(values);
@@ -169,26 +172,6 @@ export default function Signup() {
                       name="username"
                       type="text"
                       label="Nome de Usuário"
-                    />
-                    <Field
-                      fullWidth
-                      required
-                      margin="normal"
-                      variant="outlined"
-                      component={MuiTextField}
-                      name="password"
-                      type="password"
-                      label="Senha"
-                    />
-                    <Field
-                      fullWidth
-                      required
-                      margin="normal"
-                      variant="outlined"
-                      component={MuiTextField}
-                      name="confirmPassword"
-                      type="password"
-                      label="Confirme sua senha"
                     />
                   { isSubmitting && <LinearProgress />}
                     <Button
