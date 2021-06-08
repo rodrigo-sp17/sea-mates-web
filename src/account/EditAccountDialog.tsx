@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React from "react";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField } from "@material-ui/core";
@@ -7,9 +7,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextFi
 export default function EditAccountDialog(props: any) {
   const { onClose, open, user } = props;
 
-  const cancel = () => {
-    onClose(null);
-  }
+  const cancel = () => onClose(null);
 
   const validationSchema = yup.object({
     name: yup.string()
@@ -19,7 +17,7 @@ export default function EditAccountDialog(props: any) {
     email: yup.string()
       .email("E-mail inválido")
       .required("Obrigatório"),
-  })
+  });
 
   const formik = useFormik({
     initialValues: {

@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, List, ListItem, ListItemText, Typography } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { AppBar, Container, Dialog, DialogContent, Divider, Grid, IconButton, List, ListItem, ListItemText, ListSubheader, makeStyles, Toolbar, Typography } from '@material-ui/core';
+import { useRecoilValue } from 'recoil';
+import { availableFriendListState, useFriendModel } from 'model/friend_model';
+import { TransitionProps } from '@material-ui/core/transitions';
+import { Slide } from '@material-ui/core';
+import { Close } from '@material-ui/icons';
+import User from 'data/user';
 
 EventDialog.propTypes = {
   date: PropTypes.string.isRequired,
@@ -9,86 +14,79 @@ EventDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
+const useStyles = makeStyles((theme) => ({
+  list: {
+    alignItems: 'center',
+  },
+  formItems: {
+    padding: theme.spacing(1),
+  },
+}));
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & { children?: React.ReactElement<any, any> },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 export default function EventDialog(props: any) {
   const { open, onClose, date } = props;
   const parsedDate = new Date(date);
-  const history = useHistory();
+  const classes = useStyles();
 
-  const [friends, setFriends] = useState<any>([]);
+  const { loadAvailableFriends } = useFriendModel();
+  const friends = useRecoilValue(availableFriendListState);
   const [loaded, setLoaded] = useState(false);
 
-  const fetchAvailableFriends = () => {
-    fetch("/api/calendar/available?date=" + parsedDate.toISOString().substr(0, 10), {
-      method: 'GET',
-      headers: {
-        'Authorization': sessionStorage.getItem('token') || ""
-      }
-    })
-    .then(res => {
-      if (res.ok) {
-        return res.json();
-      } else if (res.status === 403) {
-        history.push("/login");
-        return new Error("User not logged");        
-      } else {
-        setFriends([]);
-        return new Error("Error fetching friends: " + res.status);
-      }      
-    })
-    .then(
-      (result) => {
-        if (result._embedded === undefined) {
-          setFriends([]);
-        } else {
-          setFriends(result._embedded.appUserList);
-        }
-      },
-      (error) => {
-        setFriends([]);
-      }
-    )
+  useEffect(() => {
+    reloadAvailableFriends(parsedDate);
+  }, [date]);
+
+  const reloadAvailableFriends = async (date: Date) => {
+    setLoaded(false);
+    await loadAvailableFriends(date);
+    setLoaded(true);
   }
 
-  useEffect(() => {
-    fetchAvailableFriends();
-    return () => setLoaded(true);
-  }, [loaded]);
+  const handleClose = () => {
+    onClose();
+  }
 
   return (
-    <Dialog open={open} maxWidth="xs" fullWidth>
-      <DialogTitle>
-        {`Dia ${parsedDate.toLocaleDateString()}`}
-      </DialogTitle>
-      <DialogContent dividers>
-        <Grid container  direction="column" spacing={3}>
-          <Grid item>
-            <Typography variant="subtitle1">Amigos em terra</Typography>
-            </Grid>
-          <Grid item>
+    <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
+      <AppBar position="relative">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="close" onClick={handleClose}>
+            <Close />
+          </IconButton>
+          <Typography variant="h6">
+            {`Dia ${parsedDate.toLocaleDateString()}`}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <DialogContent>
+        <Container disableGutters>
+          <List subheader={<ListSubheader>Amigos em terra</ListSubheader>}>
             {friends.length === 0
-              ? <Typography variant="h6">Nenhum amigo disponível</Typography>
-              : 
-                <List disablePadding>
-                  {friends.map((friend: any) => (
-                    <ListItem dense key={friend}>
-                      <ListItemText primary={friend.userInfo.name} />
-                    </ListItem>
-                  ))}
-                </List>
-            }
-          </Grid>
-          <Grid item><Divider /></Grid>          
-          <Grid item>
-            <Typography variant="subtitle1">Eventos</Typography>
-          </Grid>
-          <Grid item container xs justify="center" alignItems="center">
-            <Typography variant="body1">-</Typography>          
-          </Grid>  
-        </Grid>
+              ? <Grid xs container justify="center" alignItems="center">
+                <Typography variant="body2">Nenhum amigo disponível</Typography>
+              </Grid>
+              : friends.map((friend: User) => (
+                <ListItem divider alignItems="flex-start" key={friend.userId}>
+                  <ListItemText primary={friend.name} secondary={`${friend.username}\n${friend.email}`} />
+                </ListItem>
+              ))}
+          </List>
+          <Divider />
+          <List subheader={<ListSubheader>Eventos</ListSubheader>}>
+            <Grid container xs justify="center" alignItems="center">
+              <Typography variant="body1">-</Typography>
+            </Grid>
+          </List>
+
+        </Container>
       </DialogContent>
-      <DialogActions>
-        <Button color="primary" onClick={onClose}>Fechar</Button>
-      </DialogActions>
-    </Dialog>  
+    </Dialog>
   );
 }

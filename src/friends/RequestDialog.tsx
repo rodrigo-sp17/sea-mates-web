@@ -6,7 +6,7 @@ export default function RequestDialog(props: any) {
   const { onClose, open } = props;
   const [username, setUsername] = useState("");
   
-  const submit = (event: any) => {
+  const submit = () => {
     onClose(username);
   }
 
@@ -38,8 +38,8 @@ export default function RequestDialog(props: any) {
           />
         </DialogContent>
         <DialogActions>
-          <Button color="primary" onClick={submit}>Requisitar</Button>
           <Button color="primary" onClick={cancel}>Cancelar</Button>
+          <Button color="primary" onClick={submit}>Requisitar</Button>
         </DialogActions>
       </Dialog>
     </Grid>

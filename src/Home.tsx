@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState} from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -20,310 +20,264 @@ import Friends from 'friends/Friends';
 import Account from 'account/Account';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
+import { useLogout } from 'model/user_model';
 
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-      display: 'flex',
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    hide: {
-        display:'none',
-    },
-    title: {
-      flexGrow: 1,
-    },
-    appBar: {
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    appBarShift: {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: drawerWidth,
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
-      justifyContent: 'flex-end',
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    content: {
-      flexGrow: 1,
-      padding: theme.spacing(3),
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      //marginLeft: -drawerWidth,
-    },
-    contentShift: {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    },
-  }));
+  root: {
+    display: 'flex',
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  hide: {
+    display: 'none',
+  },
+  title: {
+    flexGrow: 1,
+  },
+  appBar: {
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-end',
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    //marginLeft: -drawerWidth,
+  },
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginLeft: 0,
+  },
+}));
 
 export default function Home() {
-    const classes = useStyles();
-    const history = useHistory();
-    const [title, setTitle] = useState("Minha Escala");
+  const classes = useStyles();
+  const history = useHistory();
+  const [title, setTitle] = useState("Minha Escala");
 
-    // Allows use of relative paths for nested contents
-    let match = useRouteMatch();
-    
-    // Drawer state
-    const [open, setOpen] = useState(false);
+  const logout = useLogout();
 
-    // Menu state
-    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-    const [notifAnchorEl, setNotifAnchorEl] = useState<Element | null>(null);
+  // Allows use of relative paths for nested contents
+  let match = useRouteMatch();
 
-    // Shifts state
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [shifts, setShifts] = useState([]);
+  // Drawer state
+  const [open, setOpen] = useState(false);
 
-    // Notifications state
-    const [notifications, setNotifications] = useState<string[]>([]);
-    const [newNotifications, setNewNotifications] = useState(0);
+  // Menu state
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [notifAnchorEl, setNotifAnchorEl] = useState<Element | null>(null);
 
-    // Helper functions
-    const changeTitle = (newTitle: string) => {
-      setTitle(newTitle);
-    }
+  // Notifications state
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const [newNotifications, setNewNotifications] = useState(0);
 
-    const redirectAccount = () => {
-      history.push("/home/account");
-    }
+  // Helper functions
+  const changeTitle = (newTitle: string) => {
+    setTitle(newTitle);
+  }
 
-    const logout = () => {
-      // Cleans session storage
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("loggedUsername");
-      
-      // Redirects to login
-      history.push("/login");
+  const redirectAccount = () => history.push("/home/account");
 
-      handleMenuClose();
-    }
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+  }
 
-    const fetchShifts = () => {
-      const token = sessionStorage.getItem("token") || "";
-      fetch("/api/shift", {
-        method: 'GET',
-        headers: {          
-          'Authorization': token
+  const subscribePush = () => {
+    const username = sessionStorage.getItem('loggedUsername');
+    const token = sessionStorage.getItem('token');
+    var es = new EventSourcePolyfill(
+      '/api/push/subscribe/' + username,
+      {
+        headers: {
+          "Authorization": token,
         }
-      })
-      .then(res => {
-        if (res.status === 403) {
-          history.push("/login");
-          return new Error("User not logged");
-        } else if (res.ok) {
-          return res.json();
-        }
-      })
-      .then(
-        (result) => {
-          const newShifts = result._embedded;
-          if (newShifts === undefined) {
-            setShifts([]);
-          } else {
-            setShifts(newShifts.shiftList)
-          }
-          setIsLoaded(true);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setShifts([]);
-        }
-      );
-    }
-
-    const subscribePush = () => {
-      const username = sessionStorage.getItem('loggedUsername');
-      const token = sessionStorage.getItem('token');
-      var es = new EventSourcePolyfill(
-        '/api/push/subscribe/' + username,
-        {
-          headers: {
-            "Authorization": token,
-          }
-        }
-        );
-      
-      es.onerror = () => es.close();
-      es.addEventListener("FRIEND_REQUEST", (e: any) => handleFriendRequestEvent(e));
-      es.addEventListener("FRIEND_ACCEPT", (e: any) => handleFriendAcceptEvent(e));
-    }
-
-    const handleFriendRequestEvent = function (event: any) {
-      const username = sessionStorage.getItem("loggedUsername");
-      const data = JSON.parse(event.data);
-      const source = data.source;
-      if (source !== username) {
-        var note  = `${source} solicitou sua amizade!`;
-        var newNotifs = notifications.concat(note);
-        setNotifications(newNotifs);
-        setNewNotifications(newNotifications + 1);
       }
+    );
+
+    es.onerror = () => es.close();
+    es.addEventListener("FRIEND_REQUEST", (e: any) => handleFriendRequestEvent(e));
+    es.addEventListener("FRIEND_ACCEPT", (e: any) => handleFriendAcceptEvent(e));
+  }
+
+  const handleFriendRequestEvent = function (event: any) {
+    const username = sessionStorage.getItem("loggedUsername");
+    const data = JSON.parse(event.data);
+    const source = data.source;
+    if (source !== username) {
+      var note = `${source} solicitou sua amizade!`;
+      var newNotifs = notifications.concat(note);
+      setNotifications(newNotifs);
+      setNewNotifications(newNotifications + 1);
     }
+  }
 
-    const handleFriendAcceptEvent = function (event: any) {
-      const username = sessionStorage.getItem("loggedUsername");
-      const data = JSON.parse(event.data);
-      const source = data.source;
-      if (source !== username) {
-        var note  = `${source} aceitou sua solicitação!`;
-        var newNotifs = notifications.concat(note);
-        setNotifications(newNotifs);
-        setNewNotifications(newNotifications + 1);
-      }
+  const handleFriendAcceptEvent = function (event: any) {
+    const username = sessionStorage.getItem("loggedUsername");
+    const data = JSON.parse(event.data);
+    const source = data.source;
+    if (source !== username) {
+      var note = `${source} aceitou sua solicitação!`;
+      var newNotifs = notifications.concat(note);
+      setNotifications(newNotifs);
+      setNewNotifications(newNotifications + 1);
     }
+  }
 
-    useEffect(() => {
-      subscribePush();
-    }, []);    
-    
-    useEffect(() => {
-      fetchShifts();
-      setIsLoaded(true);
-    }, [isLoaded]);
+  useEffect(() => {
+    subscribePush();
+  }, []);
 
-    // Drawer handler
-    const toggleDrawer = (open: boolean) => (event: SyntheticEvent) => {
-      setOpen(open);
-    }
 
-    // Menu handlers
-    const handleMenuOpen = (event: SyntheticEvent) => {
-      setAnchorEl(event.currentTarget);
-    }
+  // Drawer handler
+  const toggleDrawer = (open: boolean) => (event: SyntheticEvent) => {
+    setOpen(open);
+  }
 
-    const handleNotifMenuOpen = (event: SyntheticEvent) => {
-      setNotifAnchorEl(event.currentTarget);
-      setNewNotifications(0);
-    }
+  // Menu handlers
+  const handleMenuOpen = (event: SyntheticEvent) => {
+    setAnchorEl(event.currentTarget);
+  }
 
-    const handleMenuClose = () => {
-      setAnchorEl(null);
-      setNotifAnchorEl(null);
-    }
+  const handleNotifMenuOpen = (event: SyntheticEvent) => {
+    setNotifAnchorEl(event.currentTarget);
+    setNewNotifications(0);
+  }
 
-    return (
-        <div className='root'>
-            <AppBar 
-                position="absolute" 
-                className={clsx(classes.appBar, open && classes.appBarShift)}
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setNotifAnchorEl(null);
+  }
+
+  return (
+    <div className='root'>
+      <AppBar
+        position="absolute"
+        className={clsx(classes.appBar, open && classes.appBarShift)}
+      >
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open menu"
+            onClick={toggleDrawer(true)}
+            className={clsx(classes.menuButton, open && classes.hide)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" className={classes.title}>
+            {title}
+          </Typography>
+          <IconButton onClick={handleNotifMenuOpen} color="inherit">
+            <Badge
+              badgeContent={newNotifications}
+              color="error"
             >
-                <Toolbar>
-                    <IconButton
-                      edge="start"
-                      color="inherit"
-                      aria-label="open menu"
-                      onClick={toggleDrawer(true)}
-                      className={clsx(classes.menuButton, open && classes.hide)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={classes.title}>
-                      {title}   
-                    </Typography>
-                    <IconButton onClick={handleNotifMenuOpen} color="inherit">
-                      <Badge 
-                        badgeContent={newNotifications}
-                        color="error"
-                        >
-                          <NotificationsIcon />
-                      </Badge>
-                    </IconButton>
-                    <IconButton color="inherit" onClick={handleMenuOpen}>
-                      <AccountCircle id="account-circle"/>
-                    </IconButton>
-                    <Menu
-                      id="menu-notifications"
-                      anchorEl={notifAnchorEl}
-                      keepMounted
-                      open={Boolean(notifAnchorEl)}
-                      onClose={handleMenuClose}
-                    >
-                      {notifications.map((notif, index) => <MenuItem key={index}>{notif}</MenuItem>)}
-                    </Menu>
-                    <Menu 
-                      id="menu-account"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem disabled>
-                        {sessionStorage.getItem("loggedUsername")}
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem onClick={redirectAccount}>
-                        Minha Conta
-                      </MenuItem>
-                      <MenuItem onClick={logout}>
-                        Logout
-                      </MenuItem>                      
-                    </Menu>
-                </Toolbar>
-            </AppBar>
-            <Drawer
-                variant="temporary"
-                anchor="left"
-                open={open}
-                className={classes.drawer}
-                classes={{
-                    paper: classes.drawerPaper
-                }}
-                onKeyDown={toggleDrawer(false)}
-                onClick={toggleDrawer(false)}
-            >
-                <div className={classes.drawerHeader}>
-                    <IconButton
-                        onClick={toggleDrawer(false)}
-                    >
-                        <ChevronLeft />
-                    </IconButton>
-                </div>
-                <Divider />
-                <List onClick={toggleDrawer(false)}>
-                    <ListItem button key="calendar"
-                      component={Link}
-                      to={`${match.url}/calendar`}
-                    >
-                        <ListItemIcon><CalendarToday /></ListItemIcon>
-                        <ListItemText primary="Calendário"/>
-                    </ListItem>
-                    <ListItem button key="shifts"
-                      component={Link}
-                      to={`${match.url}/shifts`}
-                    >
-                        <ListItemIcon><DateRange /></ListItemIcon>
-                        <ListItemText primary="Escalas"/>
-                    </ListItem>
-                    {/* 
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <IconButton color="inherit" onClick={handleMenuOpen}>
+            <AccountCircle id="account-circle" />
+          </IconButton>
+          <Menu
+            id="menu-notifications"
+            anchorEl={notifAnchorEl}
+            keepMounted
+            open={Boolean(notifAnchorEl)}
+            onClose={handleMenuClose}
+          >
+            {notifications.map((notif, index) => <MenuItem key={index}>{notif}</MenuItem>)}
+          </Menu>
+          <Menu
+            id="menu-account"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem disabled>
+              {sessionStorage.getItem("loggedUsername")}
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={redirectAccount}>
+              Minha Conta
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              Logout
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="temporary"
+        anchor="left"
+        open={open}
+        className={classes.drawer}
+        classes={{
+          paper: classes.drawerPaper
+        }}
+        onKeyDown={toggleDrawer(false)}
+        onClick={toggleDrawer(false)}
+      >
+        <div className={classes.drawerHeader}>
+          <IconButton
+            onClick={toggleDrawer(false)}
+          >
+            <ChevronLeft />
+          </IconButton>
+        </div>
+        <Divider />
+        <List onClick={toggleDrawer(false)}>
+          <ListItem button key="calendar"
+            component={Link}
+            to={`${match.url}/calendar`}
+          >
+            <ListItemIcon><CalendarToday /></ListItemIcon>
+            <ListItemText primary="Calendário" />
+          </ListItem>
+          <ListItem button key="shifts"
+            component={Link}
+            to={`${match.url}/shifts`}
+          >
+            <ListItemIcon><DateRange /></ListItemIcon>
+            <ListItemText primary="Escalas" />
+          </ListItem>
+          {/* 
                     <ListItem button key="events"
                       component={Link}
                       to={`${match.url}/events`}
@@ -332,41 +286,41 @@ export default function Home() {
                         <ListItemText primary="Eventos"/>
                     </ListItem>
                     */}
-                    <ListItem button key="friends"
-                      component={Link}
-                      to={`${match.url}/friends`}
-                    >
-                        <ListItemIcon><People /></ListItemIcon>
-                        <ListItemText primary="Amigos"/>
-                    </ListItem>
-                </List>
-            </Drawer>
-            <div className={classes.drawerHeader} />
-            <main className={classes.content}>
-              <Switch>
-                <Route path={`${match.path}/calendar`}>                  
-                  <Calendar shifts={shifts} changeTitle={changeTitle}/>
-                </Route>                
-                <Route path={`${match.path}/shifts`}>
-                  <Shifts shifts={shifts} fetchShifts={fetchShifts} changeTitle={changeTitle} />
-                </Route>
-                <Route path={`${match.path}/events`}>                  
-                </Route>
-                <Route path={`${match.path}/friends`}>
-                  <Friends changeTitle={changeTitle} />
-                </Route>                
-                <Route exact path={match.path}>
-                  <Redirect to={`${match.path}/calendar`} />
-                </Route>
-                <Route exact path={`${match.path}/account`}>
-                  <Account changeTitle={changeTitle} />
-                </Route>
-              </Switch>
-            </main>
-          </div>
-    );
+          <ListItem button key="friends"
+            component={Link}
+            to={`${match.url}/friends`}
+          >
+            <ListItemIcon><People /></ListItemIcon>
+            <ListItemText primary="Amigos" />
+          </ListItem>
+        </List>
+      </Drawer>
+      <div className={classes.drawerHeader} />
+      <main className={classes.content}>
+        <Switch>
+          <Route path={`${match.path}/calendar`}>
+            <Calendar changeTitle={changeTitle} />
+          </Route>
+          <Route path={`${match.path}/shifts`}>
+            <Shifts changeTitle={changeTitle} />
+          </Route>
+          <Route path={`${match.path}/events`}>
+          </Route>
+          <Route path={`${match.path}/friends`}>
+            <Friends changeTitle={changeTitle} />
+          </Route>
+          <Route exact path={match.path}>
+            <Redirect to={`${match.path}/calendar`} />
+          </Route>
+          <Route exact path={`${match.path}/account`}>
+            <Account changeTitle={changeTitle} />
+          </Route>
+        </Switch>
+      </main>
+    </div>
+  );
 }
 
 function Notification() {
-  
+
 }

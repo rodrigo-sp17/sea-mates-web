@@ -65,6 +65,7 @@ export default function Signup() {
   return(
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
+        
         <Avatar 
           className={classes.logo}
           src={logo}

@@ -6,6 +6,7 @@ import BadRequestError from "errors/bad_request_error";
 import ConflictError from "errors/conflict_error";
 import ForbiddenError from "errors/forbidden_error";
 import ServerError from "errors/server_error";
+import { useHistory } from "react-router";
 import { atom, selector, useRecoilState, useSetRecoilState } from "recoil";
 
 //////////////////////////////////////////////////
@@ -195,6 +196,14 @@ export const useDeleteUser = () => {
         return 'Desculpe, um erro inesperado aconteceu';
       }
     }
+  }
+}
+
+export const useLogout = () => {
+  const history = useHistory();
+  return () => {
+    sessionStorage.removeItem('user');
+    history.push('/login');
   }
 }
 

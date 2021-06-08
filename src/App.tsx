@@ -7,10 +7,9 @@ import {
   Switch,
   Route,
   Redirect,
-  useHistory
 } from "react-router-dom";
 import Signup from 'auth/Signup';
-import Shift from 'shifts/Shift';
+import ShiftDialog from 'shifts/ShiftDialog';
 import Recovery from 'auth/Recovery';
 import PasswordReset from 'auth/PasswordReset';
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
@@ -87,17 +86,6 @@ function PrivateRoute({ children, ...rest }: any) {
 }
 
 export default function App() {
-  const history = useHistory();
-/*
-  const redirectHome = () => history.push("/home");
-  const redirectLogin = () => history.push('/login');
-
-  if (sessionStorage.getItem('user') !== null) {
-    redirectHome();
-  } else {
-    redirectLogin();
-  }
-*/
   // Main routing for the application
   return (
     <React.Fragment>
@@ -124,7 +112,7 @@ export default function App() {
               <Home />
             </PrivateRoute>        
             <PrivateRoute exact path="/shift">
-              <Shift />
+              <ShiftDialog />
             </PrivateRoute>
             <Route exact path="/recovery">
               <Recovery />

@@ -4,6 +4,8 @@ export default class Shift {
     boardingDate: Date;
     leavingDate: Date;
     unavailabilityEndDate: Date;
+    cycleDays: number;
+    repeat: number;
 
     constructor() {
         this.shiftId = 0;
@@ -11,5 +13,7 @@ export default class Shift {
         this.boardingDate = new Date();
         this.leavingDate = new Date();
         this.unavailabilityEndDate = new Date();
+        this.cycleDays = 0;
+        this.repeat = 0;
     }
 }

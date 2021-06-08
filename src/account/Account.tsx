@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Button, Divider, Grid, LinearProgress, makeStyles, Snackbar, TextField, Typography } from "@material-ui/core";
+import { Avatar, Button, Container, Divider, Grid, LinearProgress, makeStyles, Snackbar, TextField, Typography } from "@material-ui/core";
 import { useHistory } from 'react-router';
 import DeleteAccountDialog from './DeleteAccountDialog';
 import Alert from 'components/Alert';
@@ -10,9 +10,10 @@ import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({
   paper: {
-    display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 800
   },
   header: {
     alignSelf: 'center'
@@ -123,7 +124,7 @@ export default function Account(props: any) {
   }
 
   return (
-    <Grid container spacing={3} direction="column" alignItems="stretch">
+    <Container className={classes.paper} disableGutters>
       <Grid container item direction="column" alignItems="center">
         <Avatar className={classes.logo}/>
         <Typography variant="h6">
@@ -191,6 +192,6 @@ export default function Account(props: any) {
             : <Alert severity="error" >{message}</Alert>
         }
       </Snackbar>
-    </Grid>
+    </Container>
   );
 }
