@@ -6,7 +6,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
+  useHistory
 } from "react-router-dom";
 import Signup from 'auth/Signup';
 import Shift from 'shifts/Shift';
@@ -16,6 +17,8 @@ import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import LoginSuccess from 'auth/LoginSuccess';
 import Privacy from 'misc/Privacy';
 import ServiceTerms from 'misc/ServiceTerms';
+import { userState } from 'model/user_model';
+import { useRecoilValue } from 'recoil';
 
 const theme = createMuiTheme({
   palette: {
@@ -63,12 +66,12 @@ const theme = createMuiTheme({
 
 
 function PrivateRoute({ children, ...rest }: any) {
-  let auth = sessionStorage.getItem('token');
+  const user = useRecoilValue(userState);
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        auth ? (
+        user ? (
           children
         ) : (
           <Redirect
@@ -83,9 +86,18 @@ function PrivateRoute({ children, ...rest }: any) {
   );
 }
 
-
 export default function App() {
+  const history = useHistory();
+/*
+  const redirectHome = () => history.push("/home");
+  const redirectLogin = () => history.push('/login');
 
+  if (sessionStorage.getItem('user') !== null) {
+    redirectHome();
+  } else {
+    redirectLogin();
+  }
+*/
   // Main routing for the application
   return (
     <React.Fragment>

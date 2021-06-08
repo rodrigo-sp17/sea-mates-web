@@ -5,6 +5,8 @@ import * as Yup from "yup";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, makeStyles, Typography } from '@material-ui/core';
 import { TextField } from 'formik-material-ui';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useResetPassword } from 'model/user_model';
+import UserRequest from 'data/user_request';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,9 +35,10 @@ export default function PasswordReset() {
   const classes = useStyles();  
   const location = useLocation();
   const history = useHistory();
+  const resetPassword = useResetPassword();
 
   // Reads reset token from path
-  const token = new URLSearchParams(location.search).get("reset");
+  const token = new URLSearchParams(location.search).get("reset") || "";
   
   // Form state
   const [formState, setState] = useState<any>({
@@ -54,54 +57,27 @@ export default function PasswordReset() {
   })
 
   const send = async () => {
+    var req = new UserRequest();
+    req.username = formState.username;
+    req.password = formState.password;
+    req.confirmPassword = formState.confirmPassword;
     
-    await fetch("/api/user/resetPassword", {
-      method: 'POST',
-      headers: {
-        "reset": token || "",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: formState.username,
-        password: formState.password,
-        confirmPassword: formState.confirm
+    var errorMsg = await resetPassword(req, token);
+    if (errorMsg) {
+      setDialog({
+        title: "Ops...",
+        message: errorMsg
+      });
+      setOpen(true);
+      setSuccess(false);
+    } else {
+      setDialog({
+        title: "Sucesso!",
+        message: "Sua senha foi redefinida. Por favor, efetue o login normalmente!"
       })
-    })
-    .then(
-      (res) => {
-        switch (res.status) {
-          case 200:
-            setDialog({
-              title: "Sucesso!",
-              message: "Sua senha foi redefinida. Por favor, efetue o login normalmente!"
-            })
-            setOpen(true);
-            setSuccess(true);
-            break;
-          case 403:
-            history.push("/login");
-            break;
-          case 400:
-            setOpen(true);
-            break;
-          default:
-            setDialog({
-              ...dialog,
-              message: "Algo deu errado em sua solicitação! Por favor, atualize a página e tente novamente!"
-            })
-            setOpen(true);
-            break;
-        }
-      }, 
-      (error) => {
-        setDialog({
-          ...dialog,
-          message: "Algo deu errado em nosso servidor! Por favor, atualize a página e tente novamente!"
-        })
-        setOpen(true);
-      }
-    );
-    
+      setOpen(true);
+      setSuccess(true);
+    }
   }
 
   const closeDialog = () => {

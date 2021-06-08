@@ -5,6 +5,8 @@ import DeleteAccountDialog from './DeleteAccountDialog';
 import Alert from 'components/Alert';
 import EditAccountDialog from './EditAccountDialog';
 import User from 'data/user';
+import { useDeleteUser, useEditUser, useReloadUser, userState } from 'model/user_model';
+import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -42,13 +44,16 @@ export default function Account(props: any) {
     deleteDialog: false,
   });
 
-  const [user, setUser] = useState(new User());
+  const originalUser = useRecoilValue(userState);
+  const [localUser, setLocalUser] = useState(new User());
+  const editUser = useEditUser();
+  const deleteUser = useDeleteUser();
+  const reloadUser = useReloadUser();
 
   // Snack state
   const [snack, showSnack] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("Sucesso!");
-  const [errorMsg, setErrorMsg] = useState("");  
+  const [message, setMessage] = useState("");
 
   // Changes parent title
   useEffect(() => {
@@ -56,146 +61,53 @@ export default function Account(props: any) {
   }, []);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token") || "";
+    if (isLoaded == false) {
+      loadUser();
+    } else {
+      if (originalUser !== null) {
+        setLocalUser(originalUser);
+      }
+    }
+  }, [isLoaded]);
 
-    fetch("/api/user/me", {
-      method: "GET",
-      headers: {
-        "Authorization": token,
-      }
-    }).then(
-      (res) => {
-        switch (res.status) {
-          case 200:
-            return res.json();
-          case 403:
-            history.push("/login");
-            return;
-          default:
-            setSuccess(false);
-            setErrorMsg("Não foi possível recuperar seus dados! Erro: " + res.status);
-            showSnack(true);
-        }
-      },
-      (error) => {
-        setErrorMsg(error.message);
-        setSuccess(false);
-        showSnack(true);
-      }
-    )
-    .then(
-      (res) => {
-        setUser({
-          userId: res.userId,
-          name: res.userInfo.name,
-          username: res.userInfo.username,
-          email: res.userInfo.email
-        });
-      },
-      (error) => {
-        setErrorMsg(error.message);
-        setSuccess(false);
-        showSnack(true);
-      }
-    );
+  const loadUser = async () => {
+    await reloadUser();
     setIsLoaded(true);
-  }, [isLoaded])
+  }
 
   const editAccount = async (newUser: User) => {
     if (newUser !== null) {
       setSubmitting(true);
-      
-      const token = sessionStorage.getItem("token") || "";      
-      await fetch("/api/user", {
-        method: "PUT",
-        headers: {
-          "Authorization": token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          userId: user.userId,
-          name: newUser.name,
-          email: newUser.email
-        })
-      })
-      .then(
-        (res) => {
-          switch (res.status) {
-            case 200:
-              setSuccessMsg("Usuário editado com sucesso!");
-              setSuccess(true);
-              showSnack(true);              
-              break;
-            case 403:
-              history.push("/login");
-              break;
-            case 409:
-              setSuccess(false);
-              setErrorMsg("O email já existe! Por favor, escolha outro!");
-              showSnack(true);
-              break
-            default:
-              setSuccess(false);
-              setErrorMsg("Erro inesperado do servidor: " + res.status);
-              showSnack(true);
-          }
-        },
-        (error) => {
-          setSuccess(false);
-          setErrorMsg(error.message);
-          showSnack(true);
-        }
-      );
-      setSubmitting(false);
+
+      var errorMsg = await editUser(newUser);
+      if (errorMsg) {
+        setMessage(errorMsg);
+        setSuccess(false);
+      } else {
+        setMessage("Usuário editado com sucesso!");
+        setSuccess(true);
+      }
+      showSnack(true);
     }
 
     setIsLoaded(false);    
-    setOpen({...open, editDialog: false})
+    setOpen({...open, editDialog: false});
   }
   
   const deleteAccount = async (password: string) => {
     if (password !== null || password !== "") {
       setDeleting(true);
       
-      const token = sessionStorage.getItem("token") || "";      
-
-      await fetch("/api/user/delete", {
-        method: "DELETE",
-        headers: {
-          "Authorization": token,
-          "Password": password 
-        }
-      })
-      .then(
-        (res) => {
-          switch (res.status) {
-            case 204:
-              setSuccess(true);
-              setSuccessMsg("Conta deletada com sucesso!")
-              showSnack(true);
-              
-              sessionStorage.removeItem("token");
-              sessionStorage.removeItem("loggedUsername");
-              history.push("/login");
-              break;
-            case 403:
-              history.push("/login");
-              setSuccess(false);
-              setErrorMsg("Deleção não autorizada");
-              showSnack(true);
-              break;
-            default:
-              setSuccess(false);
-              setErrorMsg("Erro ao deletar: " + res.status);
-              showSnack(true);
-          }
-        },
-        (error) => {
-          setSuccess(false);
-          setErrorMsg(error.msg);
-          showSnack(true);
-        }
-      )
+      var errorMsg = await deleteUser(localUser, password);
+      if (errorMsg) {
+        setMessage(errorMsg);
+        setSuccess(false);
+      } else {
+        setMessage("Conta deletada com sucesso!");
+        setSuccess(true);
+        history.push('/login');
+      }
+      showSnack(true);
     }
     
     setDeleting(false);
@@ -215,7 +127,7 @@ export default function Account(props: any) {
       <Grid container item direction="column" alignItems="center">
         <Avatar className={classes.logo}/>
         <Typography variant="h6">
-          {user.username}
+          {localUser.username}
         </Typography>
       </Grid>
       <Grid item>
@@ -231,7 +143,7 @@ export default function Account(props: any) {
               variant="outlined"
               margin="normal"
               label="Nome"
-              value={user.name}
+              value={localUser.name}
             />
           </Grid>
           <Grid container direction="row">
@@ -241,7 +153,7 @@ export default function Account(props: any) {
               variant="outlined"
               margin="normal"
               label="E-mail"
-              value={user.email}
+              value={localUser.email}
             />
           </Grid>
         </Grid>
@@ -256,7 +168,7 @@ export default function Account(props: any) {
         >
           Editar Dados
         </Button>
-        <EditAccountDialog onClose={editAccount} open={open.editDialog} user={user}/>
+        <EditAccountDialog onClose={editAccount} open={open.editDialog} user={localUser}/>
       </Grid>
       <Grid item>
         <Divider />
@@ -275,8 +187,8 @@ export default function Account(props: any) {
       </Grid>
       <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
           {success
-            ? <Alert severity="success">{successMsg}</Alert>
-            : <Alert severity="error" >{errorMsg}</Alert>
+            ? <Alert severity="success">{message}</Alert>
+            : <Alert severity="error" >{message}</Alert>
         }
       </Snackbar>
     </Grid>

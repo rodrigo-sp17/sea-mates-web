@@ -3,6 +3,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Link, makeStyles, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
+import { useRecoverAccount } from 'model/user_model';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,6 +27,7 @@ export default function Recovery() {
   const classes = useStyles();
   const history = useHistory();
   const [input, setInput] = useState("");
+  const recoverAccount = useRecoverAccount();
 
   // Dialog state
   const [open, setOpen] = useState(false);
@@ -41,31 +43,25 @@ export default function Recovery() {
   })
 
   // Handlers
-  const redirectLogin = () => {
-    history.push('/login');
-  }
+  const redirectLogin = () => history.push('/login');
 
   const handleChange = (event : any) => {
     setInput(event.target.value);
   }
 
   const submit = async () => {
-    await fetch("/api/user/recover?user=" + input, {
-      method: 'POST'
-    })
-    .then(
-      (res) => {
-        if (res.ok) {
-          setDialog({
-            title: "Recuperação em andamento!",
-            message: successMsg
-          })
-        }
-      }, 
-      (error) => {
-      }
-    )
-
+    let hasError = await recoverAccount(input);
+    if (hasError) {
+      setDialog({
+        title: "Ops...",
+        message: errorMsg
+      });
+    } else {
+      setDialog({
+        title: "Recuperação em andamento!",
+        message: successMsg
+      });
+    }
     setOpen(true);
   }
 
