@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
-import { Fab, Grid, makeStyles } from '@material-ui/core';
+import { Container, Fab, Grid, makeStyles } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import EventDialog from './EventDialog';
@@ -11,15 +11,21 @@ import { shiftListState } from 'model/shift_model';
 import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    maxWidth: 1200,
+  },
   fab: {
     position: 'fixed',
-    right: '20px',
-    bottom: '20px',
+    left: 'auto', 
+    right: 20,
+    bottom: 20,
     zIndex: 100
   }
 }));
 
 export default function Calendar(props: any) {
+  const { changeTitle } = props;
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const shifts = useRecoilValue(shiftListState);
@@ -37,8 +43,8 @@ export default function Calendar(props: any) {
 
   // Changes parent title
   useEffect(() => {
-    props.changeTitle("Calendário");
-  }, [])
+    changeTitle("Calendário");
+  }, [changeTitle])
 
   // Parses Shift objects to FullCalendars's Event objects
   // Shifts are assumed to always be a Shift array/list
@@ -90,7 +96,7 @@ export default function Calendar(props: any) {
   }
 
   return (
-    <Grid container spacing={3}>
+    <Container disableGutters className={classes.root}>
       <Grid item>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -115,6 +121,6 @@ export default function Calendar(props: any) {
         Escala
       </Fab>
       <EventDialog open={open} onClose={closeDialog} date={clickedDate} />
-    </Grid>
+    </Container>
   );
 }

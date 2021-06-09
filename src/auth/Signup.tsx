@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import Container from '@material-ui/core/Container';
 import Alert from '../components/Alert';
 import { useHistory } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
 import logo from 'logo.svg';
-import UserRequest from 'data/user_request';
 import { useSignup } from 'model/user_model';
 
 

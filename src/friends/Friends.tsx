@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useHistory } from 'react-router-dom';
 import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, ListSubheader, ListItemSecondaryAction, Container } from '@material-ui/core';
 import { Add, Delete, DirectionsBoat, Home, HourglassEmpty, PersonAdd, PriorityHigh } from '@material-ui/icons';
 import Alert from '../components/Alert';
@@ -17,11 +16,20 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     maxWidth: 1000,
   },
+  fab: {
+    position: 'fixed',
+    left: 'auto', 
+    right: 20,
+    bottom: 20,
+    zIndex: 100
+  },
+  list: {
+    marginBottom: theme.spacing(2)
+  }
 }));
 
 export default function Friends(props: any) {
   const classes = useStyles();
-  const history = useHistory();
   const { requestFriendship, acceptFriendship, unfriend, loadAll } = useFriendModel();
 
   // Dialog state
@@ -132,7 +140,7 @@ export default function Friends(props: any) {
           </ListItem>
         ))}
       </List>
-      <List>
+      <List className={classes.list}>
         {myRequests.map((request: FriendRequest) => {
           <ListItem alignItems="center" disableGutters key={request.id}>
             <ListItemIcon><HourglassEmpty /></ListItemIcon>
@@ -145,7 +153,7 @@ export default function Friends(props: any) {
         })}
       </List>
       <Divider/>
-      <List subheader={<ListSubheader>Amizades</ListSubheader>}>
+      <List subheader={<ListSubheader>Amizades</ListSubheader>} className={classes.list}>
         {friends.map((friend: Friend) => (
           <ListItem alignItems="center" disableGutters button key={friend.userId}>
             <ListItemIcon>
@@ -179,7 +187,7 @@ export default function Friends(props: any) {
           </ListItem>
         ))}
       </List>
-      <Grid container justify="flex-end">
+      <Grid container justify="flex-end" className={classes.fab}>
         <Fab color="primary" aria-label="add" onClick={toggleDialog('requestDialog', true)}>
           <Add />
         </Fab>

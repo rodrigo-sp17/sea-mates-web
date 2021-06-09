@@ -1,6 +1,6 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import { AppBar, Container, Dialog, DialogContent, Divider, Grid, IconButton, List, ListItem, ListItemText, ListSubheader, makeStyles, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Container, Dialog, DialogContent, Divider, Grid, IconButton, List, ListItem, ListItemText, ListSubheader, Toolbar, Typography } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
 import { availableFriendListState, useFriendModel } from 'model/friend_model';
 import { TransitionProps } from '@material-ui/core/transitions';
@@ -14,15 +14,6 @@ EventDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    alignItems: 'center',
-  },
-  formItems: {
-    padding: theme.spacing(1),
-  },
-}));
-
 const Transition = forwardRef(function Transition(
   props: TransitionProps & { children?: React.ReactElement<any, any> },
   ref: React.Ref<unknown>,
@@ -33,7 +24,6 @@ const Transition = forwardRef(function Transition(
 export default function EventDialog(props: any) {
   const { open, onClose, date } = props;
   const parsedDate = new Date(date);
-  const classes = useStyles();
 
   const { loadAvailableFriends } = useFriendModel();
   const friends = useRecoilValue(availableFriendListState);

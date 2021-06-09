@@ -22,7 +22,7 @@ export default class ShiftClient {
           } else {
             return newShifts.shiftList;
           }
-        } else if (res.status == 403) {
+        } else if (res.status === 403) {
           throw new ForbiddenError('Forbidden');
         } else {
           throw new ServerError("Unexpected server response, code: " + res.status);

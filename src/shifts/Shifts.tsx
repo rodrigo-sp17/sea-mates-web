@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import Alert from 'components/Alert';
-import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography, Hidden } from '@material-ui/core';
-import { Add, Delete, Edit } from '@material-ui/icons';
+import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography, Container, makeStyles } from '@material-ui/core';
+import { Add, Delete } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import Shift from 'data/shift';
 import { checkedShiftState, shiftListState, useShiftModel } from 'model/shift_model';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+    maxWidth: 1200,
+  },
+  fab: {
+    position: 'fixed',
+    left: 'auto', 
+    right: 20,
+    bottom: 20,
+    zIndex: 100
+  }
+}));
 
 export default function Shifts(props: any) {
+  const { changeTitle } = props;
+  const classes = useStyles();
   const { deleteShift } = useShiftModel();
   
   // Shift selection state (through checkbox)
@@ -23,8 +38,8 @@ export default function Shifts(props: any) {
 
   // Changes parent title
   useEffect(() => {
-      props.changeTitle("Escalas");
-  }, [])
+    changeTitle("Escalas");
+  }, [changeTitle])
   
   
   const deleteShifts = () => {
@@ -63,7 +78,7 @@ export default function Shifts(props: any) {
     }
     setChecked(oldChecked);
 
-    if (oldChecked.size == 0) {
+    if (oldChecked.size === 0) {
       setShowDeleteFab(false);
     } else {
       if (!showDeleteFab) {
@@ -73,7 +88,7 @@ export default function Shifts(props: any) {
   };
 
   return (
-    <Grid container direction="column" alignItems="stretch">
+    <Container disableGutters className={classes.root}>
       <Grid container justify="center">
         <List>
           {shifts.map((shift: Shift) => (
@@ -102,7 +117,7 @@ export default function Shifts(props: any) {
           ))}
         </List>
       </Grid>
-      <Grid container justify="flex-end">
+      <Grid container justify="flex-end" className={classes.fab}>
         {showDeleteFab 
         ? <Fab color="secondary" aria-label="delete" onClick={deleteShifts} children={<Delete />}/>
         : <Fab color="primary" aria-label="add" component={Link} to="/shift" children={<Add />} />            
@@ -116,6 +131,6 @@ export default function Shifts(props: any) {
           }
         </Snackbar>
       </Grid>
-    </Grid>
+    </Container>
   );
 }

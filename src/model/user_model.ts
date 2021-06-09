@@ -17,7 +17,7 @@ export const userState = selector<User|null>({
   get: ({get}): User|null => {
     var userString = sessionStorage.getItem("user");
     if (userString == null) {
-      return null;
+      return new User();
     }
     return JSON.parse(userString);
   },

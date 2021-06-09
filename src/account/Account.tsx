@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     width: '100%',
-    maxWidth: 800
+    maxWidth: 1000
   },
   header: {
     alignSelf: 'center'
@@ -33,6 +33,7 @@ const useStyles = makeStyles(theme => ({
 
 
 export default function Account(props: any) {
+  const {changeTitle} = props;
   const classes = useStyles();
   const history = useHistory();
 
@@ -58,11 +59,11 @@ export default function Account(props: any) {
 
   // Changes parent title
   useEffect(() => {
-    props.changeTitle('Minha Conta');
-  }, []);
+    changeTitle('Minha Conta');
+  }, [changeTitle]);
 
   useEffect(() => {
-    if (isLoaded == false) {
+    if (isLoaded === false) {
       loadUser();
     } else {
       if (originalUser !== null) {

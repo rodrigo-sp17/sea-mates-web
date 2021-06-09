@@ -1,7 +1,6 @@
 import Friend from "data/friend";
 import FriendRequest from "data/friend_request";
 import User from "data/user";
-import UserRequest from "data/user_request";
 import BadRequestError from "errors/bad_request_error";
 import ForbiddenError from "errors/forbidden_error";
 import NotFoundError from "errors/not_found_error";
