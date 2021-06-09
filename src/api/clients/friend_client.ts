@@ -1,10 +1,10 @@
-import Friend from "data/friend";
-import FriendRequest from "data/friend_request";
-import User from "data/user";
-import BadRequestError from "errors/bad_request_error";
-import ForbiddenError from "errors/forbidden_error";
-import NotFoundError from "errors/not_found_error";
-import ServerError from "errors/server_error";
+import Friend from "api/data/friend";
+import FriendRequest from "api/data/friend_request";
+import User from "api/data/user";
+import BadRequestError from "api/errors/bad_request_error";
+import ForbiddenError from "api/errors/forbidden_error";
+import NotFoundError from "api/errors/not_found_error";
+import ServerError from "api/errors/server_error";
 
 export default class FriendClient {
 

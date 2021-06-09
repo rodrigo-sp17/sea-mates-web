@@ -1,8 +1,8 @@
-import ShiftClient from "clients/shift_client";
-import Shift from "data/shift";
-import ForbiddenError from "errors/forbidden_error";
-import NotFoundError from "errors/not_found_error";
-import ServerError from "errors/server_error";
+import ShiftClient from "api/clients/shift_client";
+import Shift from "api/data/shift";
+import ForbiddenError from "api/errors/forbidden_error";
+import NotFoundError from "api/errors/not_found_error";
+import ServerError from "api/errors/server_error";
 import { useHistory } from "react-router";
 import { atom, useRecoilValue, useSetRecoilState } from "recoil"
 import { userState } from "./user_model";

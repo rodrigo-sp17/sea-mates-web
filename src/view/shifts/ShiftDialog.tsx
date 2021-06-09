@@ -14,8 +14,8 @@ import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/picker
 import DateFnsUtils from '@date-io/date-fns';
 import addDays from 'date-fns/addDays';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
-import { useShiftModel } from 'model/shift_model';
-import Shift from 'data/shift';
+import { useShiftModel } from 'api/model/shift_model';
+import Shift from 'api/data/shift';
 import { TransitionProps } from '@material-ui/core/transitions';
 import { isAfter, isBefore } from 'date-fns';
 

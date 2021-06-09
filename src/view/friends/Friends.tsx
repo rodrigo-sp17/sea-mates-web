@@ -5,11 +5,11 @@ import { Add, Delete, DirectionsBoat, Home, HourglassEmpty, PersonAdd, PriorityH
 import Alert from '../components/Alert';
 import RequestDialog from './RequestDialog';
 import { isAfter, isBefore } from 'date-fns';
-import Shift from 'data/shift';
-import { friendListState, myRequestListState, otherRequestListState, useFriendModel } from 'model/friend_model';
+import Shift from 'api/data/shift';
+import { friendListState, myRequestListState, otherRequestListState, useFriendModel } from 'api/model/friend_model';
 import { useRecoilValue } from 'recoil';
-import FriendRequest from 'data/friend_request';
-import Friend from 'data/friend';
+import FriendRequest from 'api/data/friend_request';
+import Friend from 'api/data/friend';
 
 const useStyles = makeStyles((theme) => ({
   root: {

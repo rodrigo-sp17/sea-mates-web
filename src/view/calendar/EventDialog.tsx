@@ -2,11 +2,11 @@ import React, { useState, useEffect, forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import { AppBar, Container, Dialog, DialogContent, Divider, Grid, IconButton, List, ListItem, ListItemText, ListSubheader, Toolbar, Typography } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
-import { availableFriendListState, useFriendModel } from 'model/friend_model';
+import { availableFriendListState, useFriendModel } from 'api/model/friend_model';
 import { TransitionProps } from '@material-ui/core/transitions';
 import { Slide } from '@material-ui/core';
 import { Close } from '@material-ui/icons';
-import User from 'data/user';
+import User from 'api/data/user';
 
 EventDialog.propTypes = {
   date: PropTypes.string.isRequired,

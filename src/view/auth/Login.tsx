@@ -4,11 +4,11 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Alert from 'components/Alert'
+import Alert from 'view/components/Alert'
 import { Avatar, Button, Divider, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
-import { useLogin } from 'model/user_model';
+import { useLogin } from 'api/model/user_model';
 
 // Required for Facebook button
 library.add(fab);

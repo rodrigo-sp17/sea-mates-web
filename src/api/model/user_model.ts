@@ -1,11 +1,11 @@
-import UserClient from "clients/user_client";
-import SocialUser from "data/social_user";
-import User from "data/user";
-import UserRequest from "data/user_request";
-import BadRequestError from "errors/bad_request_error";
-import ConflictError from "errors/conflict_error";
-import ForbiddenError from "errors/forbidden_error";
-import ServerError from "errors/server_error";
+import UserClient from "api/clients/user_client";
+import SocialUser from "api/data/social_user";
+import User from "api/data/user";
+import UserRequest from "api/data/user_request";
+import BadRequestError from "api/errors/bad_request_error";
+import ConflictError from "api/errors/conflict_error";
+import ForbiddenError from "api/errors/forbidden_error";
+import ServerError from "api/errors/server_error";
 import { useHistory } from "react-router";
 import { atom, selector, useRecoilState, useSetRecoilState } from "recoil";
 

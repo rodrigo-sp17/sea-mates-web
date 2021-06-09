@@ -7,8 +7,8 @@ import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
 import logo from 'logo.svg';
-import { useSocialSignup } from 'model/user_model';
-import SocialUser from 'data/social_user';
+import { useSocialSignup } from 'api/model/user_model';
+import SocialUser from 'api/data/social_user';
 
 
 const useStyles = makeStyles((theme) => ({

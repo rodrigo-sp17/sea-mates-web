@@ -13,14 +13,14 @@ import Drawer from '@material-ui/core/Drawer';
 import { Divider, Hidden, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core';
 import { AccountCircle, CalendarToday, DateRange, ExitToApp, People } from '@material-ui/icons';
 
-import Calendar from 'calendar/Calendar';
+import Calendar from 'view/calendar/Calendar';
 import { Link, Route, Switch, Redirect, useRouteMatch } from 'react-router-dom';
-import Shifts from 'shifts/Shifts';
-import Friends from 'friends/Friends';
-import Account from 'account/Account';
+import Shifts from 'view/shifts/Shifts';
+import Friends from 'view/friends/Friends';
+import Account from 'view/account/Account';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import { useLogout } from 'model/user_model';
+import { useLogout } from 'api/model/user_model';
 
 
 const drawerWidth = 240;

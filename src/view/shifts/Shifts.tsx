@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Alert from 'components/Alert';
+import Alert from 'view/components/Alert';
 import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography, Container, makeStyles } from '@material-ui/core';
 import { Add, Delete } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
-import Shift from 'data/shift';
-import { checkedShiftState, shiftListState, useShiftModel } from 'model/shift_model';
+import Shift from 'api/data/shift';
+import { checkedShiftState, shiftListState, useShiftModel } from 'api/model/shift_model';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles((theme) => ({

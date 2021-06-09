@@ -6,8 +6,8 @@ import { Container, Fab, Grid, makeStyles } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import EventDialog from './EventDialog';
-import Shift from 'data/shift';
-import { shiftListState } from 'model/shift_model';
+import Shift from 'api/data/shift';
+import { shiftListState } from 'api/model/shift_model';
 import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({

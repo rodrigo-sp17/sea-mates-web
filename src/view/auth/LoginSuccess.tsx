@@ -1,6 +1,6 @@
 import { CircularProgress, Container, makeStyles, Typography } from "@material-ui/core";
-import UserClient from "clients/user_client";
-import { userState } from "model/user_model";
+import UserClient from "api/clients/user_client";
+import { userState } from "api/model/user_model";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useHistory, useLocation } from "react-router";

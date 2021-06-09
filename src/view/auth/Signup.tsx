@@ -7,7 +7,7 @@ import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
 import logo from 'logo.svg';
-import { useSignup } from 'model/user_model';
+import { useSignup } from 'api/model/user_model';
 
 
 const useStyles = makeStyles((theme) => ({

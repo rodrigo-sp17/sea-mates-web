@@ -1,22 +1,22 @@
 import React from 'react';
-import Home from 'Home';
-import Login from 'auth/Login';
-import SocialSignup from 'auth/SocialSignup';
+import Home from 'view/Home';
+import Login from 'view/auth/Login';
+import SocialSignup from 'view/auth/SocialSignup';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
-import Signup from 'auth/Signup';
-import ShiftDialog from 'shifts/ShiftDialog';
-import Recovery from 'auth/Recovery';
-import PasswordReset from 'auth/PasswordReset';
+import Signup from 'view/auth/Signup';
+import ShiftDialog from 'view/shifts/ShiftDialog';
+import Recovery from 'view/auth/Recovery';
+import PasswordReset from 'view/auth/PasswordReset';
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
-import LoginSuccess from 'auth/LoginSuccess';
-import Privacy from 'misc/Privacy';
-import ServiceTerms from 'misc/ServiceTerms';
-import { userState } from 'model/user_model';
+import LoginSuccess from 'view/auth/LoginSuccess';
+import Privacy from 'view/legal/Privacy';
+import ServiceTerms from 'view/legal/ServiceTerms';
+import { userState } from 'api/model/user_model';
 import { useRecoilValue } from 'recoil';
 
 const theme = createMuiTheme({

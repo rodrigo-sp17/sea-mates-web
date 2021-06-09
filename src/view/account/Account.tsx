@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, Button, Container, Divider, Grid, LinearProgress, makeStyles, Snackbar, TextField, Typography } from "@material-ui/core";
 import { useHistory } from 'react-router';
 import DeleteAccountDialog from './DeleteAccountDialog';
-import Alert from 'components/Alert';
+import Alert from 'view/components/Alert';
 import EditAccountDialog from './EditAccountDialog';
-import User from 'data/user';
-import { useDeleteUser, useEditUser, useReloadUser, userState } from 'model/user_model';
+import User from 'api/data/user';
+import { useDeleteUser, useEditUser, useReloadUser, userState } from 'api/model/user_model';
 import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({
