@@ -171,15 +171,15 @@ export default function Login() {
         >
           Continue com Facebook
         </Button>
-        <Grid container className={classes.sub_footer}>
-          <Grid item xs>
-            <Link href="#" variant="body2" onClick={redirectRecovery}>
-              Esqueceu sua senha?
+        <Grid container direction="row" justify="space-between" alignItems='center' className={classes.sub_footer}>
+          <Grid item>
+            <Link href="#" variant="body2" onClick={redirectSignup}>
+              {"Criar nova conta"}
             </Link>
           </Grid>
           <Grid item>
-            <Link href="#" variant="body2" onClick={redirectSignup}>
-              {"Não tem uma conta? Cadastre-se!"}
+            <Link href="#" variant="body2" onClick={redirectRecovery}>
+              Esqueceu sua senha?
             </Link>
           </Grid>
         </Grid>
@@ -192,7 +192,7 @@ export default function Login() {
       </div>
       <Divider />
       <Grid container spacing={1} className={classes.legal}>
-        <Grid item xs>
+        <Grid item>
           <Link href="" variant="body2" onClick={redirectPrivacy}>
             Política de Privacidade
           </Link>
