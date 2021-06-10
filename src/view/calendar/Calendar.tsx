@@ -51,7 +51,7 @@ export default function Calendar(props: any) {
   const parseEvents = (): any => {
     var events = shifts.map((shift: Shift) => {
       var unavailable = {
-        id: shift.shiftId,
+        id: shift.shiftId.toString(),
         title: "Pré-embarque",
         start: shift.unavailabilityStartDate,
         end: shift.boardingDate,
@@ -59,12 +59,12 @@ export default function Calendar(props: any) {
         backgroundColor: "rgb(255,92,0)",
         allDay: "true",
         extendedProps: {
-          group: shift.shiftId
+          group: shift.shiftId.toString()
         }
       };
 
       var onBoard = {
-        id: "board" + shift.shiftId,
+        id: "board" + shift.shiftId.toString(),
         title: "A bordo",
         start: shift.boardingDate,
         end: shift.leavingDate,
@@ -72,12 +72,12 @@ export default function Calendar(props: any) {
         backgroundColor: "rgb(170,0,0)",
         allDay: "true",
         extendedProps: {
-          group: shift.shiftId
+          group: shift.shiftId.toString()
         }
       };
 
       var available = {
-        id: "available" + shift.shiftId,
+        id: "available" + shift.shiftId.toString(),
         title: "Pós-embarque",
         start: shift.leavingDate,
         end: shift.unavailabilityEndDate,
@@ -85,7 +85,7 @@ export default function Calendar(props: any) {
         backgroundColor: "rgb(0,185,185)",
         allDay: "true",
         extendedProps: {
-          group: shift.shiftId
+          group: shift.shiftId.toString()
         }
       }
 
@@ -105,7 +105,7 @@ export default function Calendar(props: any) {
           height="auto"
           contentHeight="auto"
           locale="pt-br"
-          events={parseEvents}
+          events={parseEvents()}
           dateClick={handleDayClick}
         />
       </Grid>

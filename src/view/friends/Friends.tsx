@@ -6,7 +6,7 @@ import Alert from '../components/Alert';
 import RequestDialog from './RequestDialog';
 import { isAfter, isBefore } from 'date-fns';
 import Shift from 'api/data/shift';
-import { friendListState, myRequestListState, otherRequestListState, useFriendModel } from 'api/model/friend_model';
+import { friendListState, requestListState, useFriendModel } from 'api/model/friend_model';
 import { useRecoilValue } from 'recoil';
 import FriendRequest from 'api/data/friend_request';
 import Friend from 'api/data/friend';
@@ -14,11 +14,11 @@ import Friend from 'api/data/friend';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    maxWidth: 1000,
+    maxWidth: 1200,
   },
   fab: {
     position: 'fixed',
-    left: 'auto', 
+    left: 'auto',
     right: 20,
     bottom: 20,
     zIndex: 100
@@ -39,10 +39,10 @@ export default function Friends(props: any) {
   });
 
   // Friends state
-  const myRequests = useRecoilValue(myRequestListState);
-  const otherRequests = useRecoilValue(otherRequestListState);
+  //const myRequests = useRecoilValue(myRequestListState);
+  //const otherRequests = useRecoilValue(otherRequestListState);
+  const { myRequests, otherRequests } = useRecoilValue(requestListState);
   const friends = useRecoilValue(friendListState);
-  const [loaded, setLoaded] = useState(false);
 
   // Snack state
   const [snack, showSnack] = useState(false);
@@ -55,15 +55,8 @@ export default function Friends(props: any) {
   }, [])
 
   useEffect(() => {
-    if (!loaded) {
-      loadData();
-    }
-  }, [loaded])
-
-  const loadData = async () => {
-    await loadAll();
-    setLoaded(true);
-  }
+    loadAll();
+  }, []);
 
   const handleRequestFriendship = async (username: string) => {
     setOpen({ ...open, requestDialog: false });
@@ -94,7 +87,12 @@ export default function Friends(props: any) {
     showSnack(true);
   }
 
-  const handleUnfriend = (username: string) => async () => {
+  const handleUnfriend = () => {
+    console.log('toggled');
+    setOpen({ ...open, deleteDialog: true });
+  }
+
+  const doUnfriend = (username: string) => async () => {
     if (username == null || username === "") return;
 
     const errorMsg = await unfriend(username);
@@ -126,36 +124,46 @@ export default function Friends(props: any) {
 
   return (
     <Container disableGutters className={classes.root} >
-      <List subheader={<ListSubheader>Solicitações</ListSubheader>}>
-        {otherRequests.map((request: FriendRequest) => (
-          <ListItem alignItems="center" disableGutters key={request.id}>
-            <ListItemIcon><PriorityHigh /></ListItemIcon>
-            <ListItemText
-              primary={request.sourceName}
-              secondary={`${request.sourceUsername}\nRequisitado em ${request.timestamp.toLocaleString()}`}
-            />
-            <IconButton color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
-              <PersonAdd />
-            </IconButton>
-          </ListItem>
-        ))}
+      <List disablePadding subheader={<ListSubheader>Solicitações</ListSubheader>}>
+        {otherRequests.map((request: FriendRequest) => {
+          return (
+            <ListItem alignItems="center" disableGutters key={request.id}>
+              <ListItemIcon><PriorityHigh /></ListItemIcon>
+              <ListItemText
+                primary={request.sourceName}
+                secondary={
+                  <div>
+                    <div>{request.sourceUsername}</div>
+                    <div>Requisitado em {request.timestamp.toLocaleString()}</div>
+                  </div>
+                }
+              />
+              <IconButton color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
+                <PersonAdd />
+              </IconButton>
+            </ListItem>
+          )
+        })}
       </List>
-      <List className={classes.list}>
-        {myRequests.map((request: FriendRequest) => {
-          <ListItem alignItems="center" disableGutters key={request.id}>
+      <List disablePadding className={classes.list}>
+        {myRequests.map((request: FriendRequest) => (
+          <ListItem divider alignItems="center" disableGutters key={request.id}>
             <ListItemIcon><HourglassEmpty /></ListItemIcon>
             <ListItemText
               primary={request.targetName}
-              secondary={`${request.targetUsername}\nRequisitado em ${request.timestamp.toLocaleString()}`}
+              secondary={<div>
+                <div>{request.targetUsername}</div>
+                <div>Requisitado em {request.timestamp.toLocaleString()}</div>
+              </div>}
             />
 
-          </ListItem>
-        })}
+          </ListItem>)
+        )}
       </List>
-      <Divider/>
+      <Divider />
       <List subheader={<ListSubheader>Amizades</ListSubheader>} className={classes.list}>
         {friends.map((friend: Friend) => (
-          <ListItem alignItems="center" disableGutters button key={friend.userId}>
+          <ListItem divider alignItems="center" disableGutters button key={friend.userId}>
             <ListItemIcon>
               {isAvailableNow(friend.shifts)
                 ? <DirectionsBoat />
@@ -164,10 +172,15 @@ export default function Friends(props: any) {
             </ListItemIcon>
             <ListItemText
               primary={friend.name}
-              secondary={`${friend.username}\n${friend.email}`}
+              secondary={
+                <div>
+                  <div>{friend.username}</div>
+                  <div>{friend.email}</div>
+                </div>
+              }
             />
             <ListItemSecondaryAction>
-              <IconButton onClick={handleUnfriend(friend.username)}>
+              <IconButton onClick={handleUnfriend}>
                 <Delete color="error" />
               </IconButton>
             </ListItemSecondaryAction>
@@ -179,7 +192,7 @@ export default function Friends(props: any) {
                 <Button color="primary" onClick={toggleDialog('deleteDialog', false)}>
                   Cancelar
                 </Button>
-                <Button autoFocus color="primary" onClick={handleUnfriend(friend.username)}>
+                <Button autoFocus color="primary" onClick={doUnfriend(friend.username)}>
                   Aceitar
                 </Button>
               </DialogActions>
@@ -193,7 +206,7 @@ export default function Friends(props: any) {
         </Fab>
       </Grid>
       <Grid>
-        <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
+        <Snackbar open={snack} autoHideDuration={3000} onClose={() => showSnack(false)} >
           {friendSuccess
             ? <Alert severity="success">{message}</Alert>
             : <Alert severity="error" >{message}</Alert>

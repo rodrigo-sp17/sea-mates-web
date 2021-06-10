@@ -20,7 +20,8 @@ import Friends from 'view/friends/Friends';
 import Account from 'view/account/Account';
 
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import { useLogout } from 'api/model/user_model';
+import { useUserModel } from 'api/model/user_model';
+import CenterLoadingScreen from './components/CenterLoadingScreen';
 
 
 const drawerWidth = 240;
@@ -41,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
+  appBarSpacer: theme.mixins.toolbar,
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -72,7 +74,7 @@ export default function Home() {
   const classes = useStyles();
   const [title, setTitle] = useState("Minha Escala");
 
-  const logout = useLogout();
+  const { logout } = useUserModel();
 
   // Allows use of relative paths for nested contents
   let match = useRouteMatch();
@@ -202,7 +204,7 @@ export default function Home() {
         </ListItem>
         <ListItem button key="logout" onClick={handleLogout}>
           <ListItemIcon><ExitToApp /></ListItemIcon>
-          <ListItemText primary="Logout"/>
+          <ListItemText primary="Logout" />
         </ListItem>
       </List>
     </div>
@@ -211,7 +213,7 @@ export default function Home() {
   return (
     <div className='root'>
       <AppBar
-        position="relative"
+        position="fixed"
         className={classes.appBar}>
         <Toolbar>
           <Hidden smUp>
@@ -281,26 +283,29 @@ export default function Home() {
           </Drawer>
         </Hidden>
       </nav>
+      <div className={classes.appBarSpacer} />
       <main className={classes.content}>
-        <Switch>
-          <Route path={`${match.path}/calendar`}>
-            <Calendar changeTitle={changeTitle} />
-          </Route>
-          <Route path={`${match.path}/shifts`}>
-            <Shifts changeTitle={changeTitle} />
-          </Route>
-          <Route path={`${match.path}/events`}>
-          </Route>
-          <Route path={`${match.path}/friends`}>
-            <Friends changeTitle={changeTitle} />
-          </Route>
-          <Route exact path={match.path}>
-            <Redirect to={`${match.path}/calendar`} />
-          </Route>
-          <Route exact path={`${match.path}/account`}>
-            <Account changeTitle={changeTitle} />
-          </Route>
-        </Switch>
+        <React.Suspense fallback={<CenterLoadingScreen />}>
+          <Switch>
+            <Route path={`${match.path}/calendar`}>
+              <Calendar changeTitle={changeTitle} />
+            </Route>
+            <Route path={`${match.path}/shifts`}>
+              <Shifts changeTitle={changeTitle} />
+            </Route>
+            <Route path={`${match.path}/events`}>
+            </Route>
+            <Route path={`${match.path}/friends`}>
+              <Friends changeTitle={changeTitle} />
+            </Route>
+            <Route exact path={match.path}>
+              <Redirect to={`${match.path}/calendar`} />
+            </Route>
+            <Route exact path={`${match.path}/account`}>
+              <Account changeTitle={changeTitle} />
+            </Route>
+          </Switch>
+        </React.Suspense>
       </main>
     </div>
   );

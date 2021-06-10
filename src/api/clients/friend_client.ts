@@ -36,7 +36,7 @@ export default class FriendClient {
       );
 
     if (friendsListJson == null) {
-      throw new Error("Expected friend list on response");
+      return new Array<User>();
     }
 
     return FriendClient.parseFriendListJson(friendsListJson);
@@ -70,7 +70,7 @@ export default class FriendClient {
       );
 
     if (friendListJson == null) {
-      throw new Error("Expected friend list on response");
+      return new Array<Friend>();
     }
 
     return FriendClient.parseFriendListJson(friendListJson);
@@ -105,7 +105,7 @@ export default class FriendClient {
       );
 
     if (requestJson == null) {
-      throw new Error("Expected request list on response");
+      return new Array<FriendRequest>();
     }
 
     return requestJson.map((request: any) => {
@@ -176,7 +176,7 @@ export default class FriendClient {
     return fetch("/api/friend/remove?username=" + username, {
       method: 'DELETE',
       headers: {
-        'Authorization': sessionStorage.getItem('token') || ""
+        'Authorization': bearerToken
       }
     })
     .then(
@@ -199,7 +199,7 @@ export default class FriendClient {
     return friendsListJson.map((f: any) => {
       var friend = new Friend();
       friend.name = f.userInfo.name;
-      friend.username = f.userInfo.friendName;
+      friend.username = f.userInfo.username;
       friend.userId = f.userId;
       friend.email = f.userInfo.email;
       friend.shifts = f.shifts;
