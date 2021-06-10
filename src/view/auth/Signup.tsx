@@ -7,7 +7,7 @@ import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
 import logo from 'logo.svg';
-import { useSignup } from 'api/model/user_model';
+import { useUserModel } from 'api/model/user_model';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: '100%',
-    marginTop: theme.spacing(1),        
+    marginTop: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -33,39 +33,39 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Signup() {    
-    const classes = useStyles();
-    const history = useHistory();
-    const signup = useSignup();
-    
-    // Dialog state
-    const[message, setMessage] = useState("Erro crítico!");
-    const[signupSuccess, setSuccess] = useState(false);
-    const[snack, showSnack] = useState(false);
+export default function Signup() {
+  const classes = useStyles();
+  const history = useHistory();
+  const { signup } = useUserModel();
 
-    const redirectLogin = () => {
-      history.push("/login");
+  // Dialog state
+  const [message, setMessage] = useState("Erro crítico!");
+  const [signupSuccess, setSuccess] = useState(false);
+  const [snack, showSnack] = useState(false);
+
+  const redirectLogin = () => {
+    history.push("/login");
+  }
+
+  const sendSignup = async (value: any) => {
+    var errorMsg = await signup(value);
+    if (errorMsg) {
+      setMessage(errorMsg);
+      setSuccess(false);
+      showSnack(true);
+    } else {
+      setMessage("Cadastro realizado! Redirecionando para login...");
+      setSuccess(true);
+      showSnack(true);
+      setTimeout(() => { redirectLogin(); }, 2000);
     }
+  }
 
-    const sendSignup = async (value: any) => {
-      var errorMsg = await signup(value);
-      if (errorMsg) {
-        setMessage(errorMsg);
-        setSuccess(false);
-        showSnack(true);
-      } else {
-        setMessage("Cadastro realizado! Redirecionando para login...");
-        setSuccess(true);
-        showSnack(true);
-        setTimeout(() => { redirectLogin(); }, 2000);
-      }
-    }
-
-  return(
+  return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
-        
-        <Avatar 
+
+        <Avatar
           className={classes.logo}
           src={logo}
         />
@@ -95,12 +95,12 @@ export default function Signup() {
               .oneOf([Yup.ref('password'), null], 'Senha e confirmação não são iguais')
               .required("Obrigatório")
           })}
-          onSubmit={async (values, { setSubmitting } ) => {
+          onSubmit={async (values, { setSubmitting }) => {
             await sendSignup(values);
-            setSubmitting(false);       
-          }}   
+            setSubmitting(false);
+          }}
         >
-          {({ submitForm, isSubmitting}) => (
+          {({ submitForm, isSubmitting }) => (
             <Form className={classes.form}>
               <Field
                 autoFocus
@@ -153,7 +153,7 @@ export default function Signup() {
                 type="password"
                 label="Confirme sua senha"
               />
-            { isSubmitting && <LinearProgress />}
+              { isSubmitting && <LinearProgress />}
               <Button
                 className={classes.submit}
                 fullWidth
@@ -176,11 +176,11 @@ export default function Signup() {
         </Grid>
         <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
           {signupSuccess
-              ? <Alert severity="success">{message}</Alert>
-              : <Alert severity="error" >{message}</Alert>
+            ? <Alert severity="success">{message}</Alert>
+            : <Alert severity="error" >{message}</Alert>
           }
         </Snackbar>
-      </div>            
+      </div>
     </Container>
   );
 }

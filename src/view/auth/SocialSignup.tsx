@@ -7,7 +7,7 @@ import { TextField as MuiTextField } from 'formik-material-ui';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from "yup";
 import logo from 'logo.svg';
-import { useSocialSignup } from 'api/model/user_model';
+import { useUserModel } from 'api/model/user_model';
 import SocialUser from 'api/data/social_user';
 
 
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: '100%',
-    marginTop: theme.spacing(1),        
+    marginTop: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -33,27 +33,28 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function SocialSignup() {    
+export default function SocialSignup() {
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
-  const socialSignup = useSocialSignup();
+  const { socialSignup } = useUserModel();
 
   const params = new URLSearchParams(location.search);
   const name = params.get('name');
   const email = params.get('email');
   const socialId = params.get('socialId');
   const registrationId = params.get('registrationId');
-  
+
   // Dialog state
-  const[message, setMessage] = useState("Erro crítico!");
-  const[signupSuccess, setSuccess] = useState(false);
-  const[snack, showSnack] = useState(false);
+  const [message, setMessage] = useState("Erro crítico!");
+  const [signupSuccess, setSuccess] = useState(false);
+  const [snack, showSnack] = useState(false);
 
   const redirectLogin = () => history.push("/login");
-    
-  const sendSignup =  async (values: any) => {
-    var socialUser: SocialUser = {...values,
+
+  const sendSignup = async (values: any) => {
+    var socialUser: SocialUser = {
+      ...values,
       socialId: socialId,
       registrationId: registrationId
     };
@@ -70,16 +71,16 @@ export default function SocialSignup() {
     showSnack(true);
     if (signupSuccess) setTimeout(() => redirectLogin(), 2000);
   };
-     
-  return(
+
+  return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
-        <Avatar 
+        <Avatar
           className={classes.logo}
           src={logo}
         />
         <Typography variant="h4">
-            Cadastrar novo usuário
+          Cadastrar novo usuário
         </Typography>
         <Formik
           initialValues={{
@@ -99,12 +100,12 @@ export default function SocialSignup() {
               .email("E-mail inválido")
               .required("Obrigatório"),
           })}
-          onSubmit={async (values, { setSubmitting } ) => {
+          onSubmit={async (values, { setSubmitting }) => {
             await sendSignup(values);
-            setSubmitting(false);       
-          }}   
+            setSubmitting(false);
+          }}
         >
-          {({ submitForm, isSubmitting}) => (
+          {({ submitForm, isSubmitting }) => (
             <Form className={classes.form}>
               <Field
                 autoFocus
@@ -137,7 +138,7 @@ export default function SocialSignup() {
                 type="text"
                 label="Nome de Usuário"
               />
-            { isSubmitting && <LinearProgress />}
+              { isSubmitting && <LinearProgress />}
               <Button
                 className={classes.submit}
                 fullWidth
@@ -160,11 +161,11 @@ export default function SocialSignup() {
         </Grid>
         <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
           {signupSuccess
-              ? <Alert severity="success">{message}</Alert>
-              : <Alert severity="error" >{message}</Alert>
+            ? <Alert severity="success">{message}</Alert>
+            : <Alert severity="error" >{message}</Alert>
           }
         </Snackbar>
-      </div>            
+      </div>
     </Container>
   );
 }

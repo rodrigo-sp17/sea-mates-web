@@ -7,83 +7,79 @@ import ConflictError from "api/errors/conflict_error";
 import ForbiddenError from "api/errors/forbidden_error";
 import ServerError from "api/errors/server_error";
 import { useHistory } from "react-router";
-import { atom, selector, useRecoilState, useSetRecoilState } from "recoil";
+import { atom, useRecoilState, useSetRecoilState } from "recoil";
 
 //////////////////////////////////////////////////
 // State Selectors and Atoms
 //////////////////////////////////////////////////
-export const userState = selector<User|null>({
-  key: 'userState',
-  get: ({get}): User|null => {
-    var userString = sessionStorage.getItem("user");
-    if (userString == null) {
-      return new User();
-    }
-    return JSON.parse(userString);
-  },
-  set: ({set}, newValue = new User()) => {
-    sessionStorage.setItem("user", JSON.stringify(newValue));
-  }
-});
-
 export const userLoadedState = atom({
   key: 'userLoadedState',
-  default: true
+  default: false
 });
 
+export const userState = atom<User>({
+  key: 'userState',
+  default: new User()
+});
+
+export const accessDeniedState = atom<boolean>({
+  key: 'AccessDeniedState',
+  default: false,
+})
 
 /////////////////////////////////////////////////
 // Actions
 /////////////////////////////////////////////////
-export const useReloadUser = () => {
-  const [user, setUser] = useRecoilState<User|null>(userState);
-  const [loaded, setLoaded] = useRecoilState(userLoadedState);
+export const useUserModel = () => {
+  const history = useHistory();
+  const [authUser, setAuthUser] = useRecoilState(userState);
+  const setLoaded = useSetRecoilState(userLoadedState);
 
-  setLoaded(false);
+  const serverErrorMsg = "Ops, algo de errado aconteceu com o servidor...";
+  const appErrorMsg = "Desculpe, um erro inesperado aconteceu!";
 
-  if (user == null) {
-    return async () => {};
-  }
- 
-  return async () => {
-    try {
-      var fetchedUser = await UserClient.fetchUserInfo(user.bearerToken);
-      setUser(fetchedUser);
-      return null;
-    } finally {
-      setLoaded(false);
+  const isAuthenticated = (): boolean => {
+    if (authUser.bearerToken !== '') {
+      return true;
+    } else {
+      return false;
     }
   }
-}
 
-export const useLogin = () => {
-  const setUser = useSetRecoilState(userState);
-  const [loaded, setLoaded] = useRecoilState(userLoadedState);
-
-  setLoaded(false);
+  const loadAuthUser = () => {
+    var userString = sessionStorage.getItem("user");
+    if (userString == null) {
+      setAuthUser(new User());
+    } else {
+      setAuthUser(JSON.parse(userString));
+    }
+    setLoaded(true);
+  }
   
-  return async (username: string, password: string): Promise<string|null> => {
+  const saveUser = (user: User) => {
+    sessionStorage.removeItem("user");
+    sessionStorage.setItem("user", JSON.stringify(user));
+    loadAuthUser();
+  }
+
+  const login = async (username: string, password: string): Promise<string|null> => {
     try {
       var bearerToken = await UserClient.login(username, password);
       var fetchedUser = await UserClient.fetchUserInfo(bearerToken);
-      setUser(fetchedUser);
+      saveUser(fetchedUser);
       return null;
     } catch (err) {
       if (err instanceof ForbiddenError) {
         return "Usuário ou senha incorretos";
       } else if (err instanceof ServerError) {
-        return "Ops, algo de errado aconteceu com o servidor...";
+        return serverErrorMsg;
       } else {
-        return "Desculpe, um erro inesperado aconteceu!";
+        return appErrorMsg;
       }
-    } finally {
-      setLoaded(true);
     }
   }
-};
 
-export const useSignup = () => {
-  return async (request: UserRequest): Promise<string|null> => {
+  const signup = async (request: UserRequest): Promise<string|null> => {
     try {
       await UserClient.signup(request);
       return null;
@@ -93,16 +89,14 @@ export const useSignup = () => {
       } else if (err instanceof ConflictError) {
         return 'Usuário ou e-mail já existem';
       } else if (err instanceof ServerError) {
-        return 'Ops, algo de errado acontenceu com o servidor...';
+        return serverErrorMsg;
       } else {
-        return 'Desculpe, um erro inesperado aconteceu!';
+        return appErrorMsg;
       }
     }
   }
-}
 
-export const useResetPassword = () => {
-  return async (resetForm: UserRequest, token: string): Promise<string|null> => {
+  const resetPassword = async (resetForm: UserRequest, token: string): Promise<string|null> => {
     try {
       await UserClient.resetPassword(resetForm, token);
       return null;
@@ -112,16 +106,14 @@ export const useResetPassword = () => {
       } else if (err instanceof ForbiddenError) {
         return 'Acesso negado. Por favor, verifique seu token.';
       } else if (err instanceof ServerError) {
-        return 'Ops, algo de errado acontenceu com o servidor...';
+        return serverErrorMsg;
       } else {
-        return 'Desculpe, um erro inesperado aconteceu!';
+        return appErrorMsg;
       }
     }
   }
-}
 
-export const useRecoverAccount = () => {
-  return async (user: string): Promise<string|null> => {
+  const recoverAccount = async (user: string): Promise<string|null> => {
     try {
       await UserClient.recoverAccount(user);
       return null;
@@ -129,16 +121,12 @@ export const useRecoverAccount = () => {
       return "Falha ao recuperar conta";
     }
   }
-}
 
-export const useSocialSignup = () => {
-  const setUser = useSetRecoilState(userState);
-
-  return async (user: SocialUser): Promise<string|null> => {
+  const socialSignup = async (user: SocialUser): Promise<string|null> => {
     try {
       var bearerToken = await UserClient.socialSignup(user);
       var fetchedUser = await UserClient.fetchUserInfo(bearerToken);
-      setUser(fetchedUser);
+      saveUser(fetchedUser);
       return null;
     } catch (err) {
       if (err instanceof BadRequestError) {
@@ -146,22 +134,19 @@ export const useSocialSignup = () => {
       } else if (err instanceof ConflictError) {
         return 'Usuário ou e-mail já existem. Por favor, escolha outro.';
       } else if (err instanceof ServerError) {
-        return 'Ops, algo de errado acontenceu com o servidor...';
+        return serverErrorMsg;
       } else {
-        return 'Desculpe, um erro inesperado aconteceu!';
+        return appErrorMsg;
       }
     }
   }
-}
 
-export const useEditUser = () => {
-  const setUser = useSetRecoilState(userState);
-
-  return async (user: User): Promise<string|null> => {
+  const editUser = async (user: User): Promise<string|null> => {
+    let bearerToken = authUser.bearerToken;
     try {
-      await UserClient.editUser(user);
-      var fetchedUser = await UserClient.fetchUserInfo(user.bearerToken);
-      setUser(fetchedUser);
+      await UserClient.editUser(user, bearerToken);
+      var fetchedUser = await UserClient.fetchUserInfo(bearerToken);
+      saveUser(fetchedUser);
       return null;
     } catch (err) {
       if (err instanceof BadRequestError) {
@@ -169,46 +154,40 @@ export const useEditUser = () => {
       } else if (err instanceof ConflictError) {
         return 'Usuário ou e-mail já existem. Por favor, escolha outro.';
       } else if (err instanceof ServerError) {
-        return 'Ops, algo de errado acontenceu com o servidor...';
+        return serverErrorMsg;
       } else {
-        return 'Desculpe, um erro inesperado aconteceu!';
+        return appErrorMsg;
       }
     }
   }
-}
 
-export const useDeleteUser = () => {
-  return async (user: User, password: string): Promise<string|null> => {
+  const deleteUser = async (user: User, password: string): Promise<string|null> => {
     if (password == null || password === "") {
       return "A senha é obrigatória para essa operação";
     }
 
     try {
       await UserClient.deleteAccount(user, password);
-      sessionStorage.removeItem("user");
+      logout();
       return null;
     } catch (err) {
       if (err instanceof ForbiddenError) {
         return 'Acesso negado. Por favor, tente logar novamente.';
       } else if (err instanceof ServerError) {
-        return 'Ops, algo de errado acontenceu com o servidor...';
+        return serverErrorMsg;
       } else {
-        return 'Desculpe, um erro inesperado aconteceu';
+        return appErrorMsg;
       }
     }
   }
-}
 
-export const useLogout = () => {
-  const history = useHistory();
-  return () => {
+  const logout = () => {
     sessionStorage.removeItem('user');
+    sessionStorage.clear();
     history.push('/login');
   }
+
+  return { loadAuthUser, isAuthenticated, login, signup, socialSignup,
+     resetPassword, recoverAccount, editUser, deleteUser, logout, saveUser};
 }
-
-
-
-
-
 

@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, makeStyles, Typography } from '@material-ui/core';
 import { TextField } from 'formik-material-ui';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useResetPassword } from 'api/model/user_model';
+import { useUserModel } from 'api/model/user_model';
 import UserRequest from 'api/data/user_request';
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +35,7 @@ export default function PasswordReset() {
   const classes = useStyles();  
   const location = useLocation();
   const history = useHistory();
-  const resetPassword = useResetPassword();
+  const {resetPassword} = useUserModel();
 
   // Reads reset token from path
   const token = new URLSearchParams(location.search).get("reset") || "";

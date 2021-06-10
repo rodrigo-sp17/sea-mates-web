@@ -5,7 +5,7 @@ import DeleteAccountDialog from './DeleteAccountDialog';
 import Alert from 'view/components/Alert';
 import EditAccountDialog from './EditAccountDialog';
 import User from 'api/data/user';
-import { useDeleteUser, useEditUser, useReloadUser, userState } from 'api/model/user_model';
+import { userState, useUserModel } from 'api/model/user_model';
 import { useRecoilValue } from 'recoil';
 
 const useStyles = makeStyles(theme => ({
@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 
 
 export default function Account(props: any) {
-  const {changeTitle} = props;
+  const { changeTitle } = props;
   const classes = useStyles();
   const history = useHistory();
 
@@ -47,10 +47,7 @@ export default function Account(props: any) {
   });
 
   const originalUser = useRecoilValue(userState);
-  const [localUser, setLocalUser] = useState(new User());
-  const editUser = useEditUser();
-  const deleteUser = useDeleteUser();
-  const reloadUser = useReloadUser();
+  const { editUser, deleteUser } = useUserModel();
 
   // Snack state
   const [snack, showSnack] = useState(false);
@@ -62,24 +59,13 @@ export default function Account(props: any) {
     changeTitle('Minha Conta');
   }, [changeTitle]);
 
-  useEffect(() => {
-    if (isLoaded === false) {
-      loadUser();
-    } else {
-      if (originalUser !== null) {
-        setLocalUser(originalUser);
-      }
-    }
-  }, [isLoaded]);
-
-  const loadUser = async () => {
-    await reloadUser();
-    setIsLoaded(true);
-  }
-
-  const editAccount = async (newUser: User) => {
-    if (newUser !== null) {
+  const editAccount = async (newValues: any) => {
+    if (newValues !== null) {
       setSubmitting(true);
+      var newUser = new User();
+      newUser.userId = originalUser.userId;
+      newUser.name = newValues.name;
+      newUser.email = newValues.email;
 
       var errorMsg = await editUser(newUser);
       if (errorMsg) {
@@ -91,16 +77,16 @@ export default function Account(props: any) {
       }
       showSnack(true);
     }
-
-    setIsLoaded(false);    
-    setOpen({...open, editDialog: false});
+    setSubmitting(false);
+    setIsLoaded(false);
+    setOpen({ ...open, editDialog: false });
   }
-  
+
   const deleteAccount = async (password: string) => {
     if (password !== null || password !== "") {
       setDeleting(true);
-      
-      var errorMsg = await deleteUser(localUser, password);
+
+      var errorMsg = await deleteUser(originalUser, password);
       if (errorMsg) {
         setMessage(errorMsg);
         setSuccess(false);
@@ -111,25 +97,25 @@ export default function Account(props: any) {
       }
       showSnack(true);
     }
-    
+
     setDeleting(false);
     setOpen({ ...open, deleteDialog: false });
   };
 
   const openDeleteDialog = () => {
-    setOpen({...open, deleteDialog: true})
+    setOpen({ ...open, deleteDialog: true })
   }
 
   const openEditDialog = () => {
-    setOpen({...open, editDialog: true})
+    setOpen({ ...open, editDialog: true })
   }
 
   return (
     <Container className={classes.paper} disableGutters>
       <Grid container item direction="column" alignItems="center">
-        <Avatar className={classes.logo}/>
+        <Avatar className={classes.logo} />
         <Typography variant="h6">
-          {localUser.username}
+          {originalUser.username}
         </Typography>
       </Grid>
       <Grid item>
@@ -145,7 +131,7 @@ export default function Account(props: any) {
               variant="outlined"
               margin="normal"
               label="Nome"
-              value={localUser.name}
+              value={originalUser.name}
             />
           </Grid>
           <Grid container direction="row">
@@ -155,7 +141,7 @@ export default function Account(props: any) {
               variant="outlined"
               margin="normal"
               label="E-mail"
-              value={localUser.email}
+              value={originalUser.email}
             />
           </Grid>
         </Grid>
@@ -165,19 +151,19 @@ export default function Account(props: any) {
           fullWidth
           className={classes.editButton}
           onClick={openEditDialog}
-          variant="contained" 
-          color="primary"          
+          variant="contained"
+          color="primary"
         >
           Editar Dados
         </Button>
-        <EditAccountDialog onClose={editAccount} open={open.editDialog} user={localUser}/>
+        <EditAccountDialog onClose={editAccount} open={open.editDialog} user={originalUser} />
       </Grid>
       <Grid item>
         <Divider />
         {isDeleting && <LinearProgress />}
         <Button
           disabled={isDeleting}
-          fullWidth   
+          fullWidth
           className={classes.deleteButton}
           variant="contained"
           color="secondary"
@@ -185,12 +171,12 @@ export default function Account(props: any) {
         >
           Apagar Conta
         </Button>
-        <DeleteAccountDialog onClose={deleteAccount} open={open.deleteDialog}/>
+        <DeleteAccountDialog onClose={deleteAccount} open={open.deleteDialog} />
       </Grid>
       <Snackbar open={snack} autoHideDuration={5000} onClose={() => showSnack(false)} >
-          {success
-            ? <Alert severity="success">{message}</Alert>
-            : <Alert severity="error" >{message}</Alert>
+        {success
+          ? <Alert severity="success">{message}</Alert>
+          : <Alert severity="error" >{message}</Alert>
         }
       </Snackbar>
     </Container>

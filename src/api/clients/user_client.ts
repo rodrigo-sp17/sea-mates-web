@@ -13,10 +13,12 @@ export default class UserClient {
     const url = "/login";
     const options : RequestInit = {
       method: 'POST',
-      mode: 'no-cors',              
+      headers: {
+        "Content-type": 'application/json',
+      },
       body: JSON.stringify({
-        username: username,
-        password: password
+        "username": username,
+        "password": password
       })
     };
 
@@ -46,12 +48,10 @@ export default class UserClient {
 
   // Fetches user info for the given token
   static async fetchUserInfo(bearerToken: string): Promise<User> {
-    const token = bearerToken.replace("Bearer ", "");
-
     var json = await fetch("/api/user/me", {
       method: "GET",
       headers: {
-        "Authorization": token,
+        "Authorization": bearerToken,
       }
     })
     .then(
@@ -75,7 +75,7 @@ export default class UserClient {
       name: json.userInfo.name,
       username: json.userInfo.username,
       email: json.userInfo.email,
-      bearerToken: token
+      bearerToken: bearerToken
     };
   }
 
@@ -198,17 +198,17 @@ export default class UserClient {
   }
 
   // Edits an user
-  static async editUser(user: User) {
+  static async editUser(editedUser: User, bearerToken: string) {
     await fetch("/api/user", {
       method: "PUT",
       headers: {
-        "Authorization": user.bearerToken,
+        "Authorization": bearerToken,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        userId: user.userId,
-        name: user.name,
-        email: user.email
+        userId: editedUser.userId,
+        name: editedUser.name,
+        email: editedUser.email
       })
     })
     .then(

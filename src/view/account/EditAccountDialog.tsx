@@ -9,6 +9,8 @@ export default function EditAccountDialog(props: any) {
 
   const cancel = () => onClose(null);
 
+  const submit = () => formik.handleSubmit();
+
   const validationSchema = yup.object({
     name: yup.string()
       .max(60, "Deve ter 60 caracteres ou menos")
@@ -26,8 +28,8 @@ export default function EditAccountDialog(props: any) {
     },
     enableReinitialize: true,
     validationSchema: validationSchema,
-    onSubmit: async (values, actions) => {
-      await onClose({
+    onSubmit: (values, actions) => {
+      onClose({
         name: values.name,
         email: values.email
       })
@@ -41,33 +43,33 @@ export default function EditAccountDialog(props: any) {
         <DialogTitle>Editar Conta</DialogTitle>
         <DialogContent>
           <Grid container direction="column">
-              <TextField
-                variant="outlined"
-                margin="normal"
-                label="Nome"
-                name="name"
-                id="name"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-                error={formik.touched.name && Boolean(formik.errors.name)}
-                helperText={formik.touched.name && formik.errors.name}
-              />
-              <TextField 
-                variant="outlined"
-                margin="normal"
-                label="E-mail"
-                name="email"
-                id="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-              />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              label="Nome"
+              name="name"
+              id="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              label="E-mail"
+              name="email"
+              id="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+            />
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={cancel}>Cancelar</Button>
-          <Button onClick={(_) => formik.handleSubmit}>Salvar</Button>
+          <Button onClick={submit}>Salvar</Button>
         </DialogActions>
       </Dialog>
     </Grid>

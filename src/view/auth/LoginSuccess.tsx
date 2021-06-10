@@ -1,10 +1,9 @@
 import { CircularProgress, Container, makeStyles, Typography } from "@material-ui/core";
 import UserClient from "api/clients/user_client";
-import { userState } from "api/model/user_model";
+import { useUserModel } from "api/model/user_model";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useHistory, useLocation } from "react-router";
-import { useSetRecoilState } from "recoil";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -20,7 +19,7 @@ export default function LoginSuccess() {
   const classes = useStyles();
   const location = useLocation();
   const history = useHistory();
-  const setUser = useSetRecoilState(userState);
+  const { saveUser } = useUserModel();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,15 +35,15 @@ export default function LoginSuccess() {
     const token = params.get('token');
 
     var fetchedUser = await UserClient.fetchUserInfo('Bearer ' + token);
-    setUser(fetchedUser);
+    saveUser(fetchedUser);
     setIsLoading(true);
-  }    
+  }
 
   const redirectHome = () => history.push("/");
-  
+
   return (
     <Container className={classes.paper}>
-      {isLoading ? <CircularProgress /> : <Typography children={'Successful!'}/>}
+      {isLoading ? <CircularProgress /> : <Typography children={'Successful!'} />}
     </Container>
   );
 }

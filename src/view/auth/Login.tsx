@@ -8,7 +8,7 @@ import Alert from 'view/components/Alert'
 import { Avatar, Button, Divider, LinearProgress, Link, makeStyles, Snackbar, TextField, Typography } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import logo from 'logo.svg';
-import { useLogin } from 'api/model/user_model';
+import { useUserModel } from 'api/model/user_model';
 
 // Required for Facebook button
 library.add(fab);
@@ -68,10 +68,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Login() {    
+export default function Login() {
   const classes = useStyles();
   const history = useHistory();
-  const login = useLogin();
+  const { login } = useUserModel();
 
   const [state, setState] = useState({
     username: "",
@@ -89,8 +89,8 @@ export default function Login() {
   const redirectRecovery = () => history.push('/recovery');
   const redirectPrivacy = () => history.push('/privacy');
   const redirectTerms = () => history.push('/terms');
+  const redirectHome = () => history.push('/home');
 
-  
   const handleChange = (event: any) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -99,7 +99,7 @@ export default function Login() {
       [name]: value
     });
   }
-  
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setSubmitting(true);
@@ -110,12 +110,13 @@ export default function Login() {
     } else {
       setSuccess(true);
       setMessage(successMsg);
+      redirectHome();
     }
     showSnack(true);
     setSubmitting(false);
   };
-  
-  return(
+
+  return (
     <Container component="main" maxWidth="xs" className={classes.paper}>
       <div className={classes.body}>
         <Avatar
@@ -138,7 +139,7 @@ export default function Login() {
             value={state.username}
             onChange={handleChange}
           />
-          <TextField 
+          <TextField
             variant="outlined"
             margin="normal"
             required
@@ -150,14 +151,14 @@ export default function Login() {
             value={state.password}
             onChange={handleChange}
           />
-          { isSubmitting && <LinearProgress />}           
+          {isSubmitting && <LinearProgress />}
           <Button
             type="submit"
             fullWidth
             variant='contained'
             color="primary"
             disabled={isSubmitting}
-            className={classes.submit}                 
+            className={classes.submit}
           >
             Entrar
           </Button>
@@ -187,7 +188,7 @@ export default function Login() {
           {loginSuccess
             ? <Alert severity="success">{message}</Alert>
             : <Alert severity="error" >{message}</Alert>
-          }                       
+          }
         </Snackbar>
       </div>
       <Divider />
