@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
-  },  
+  },
   form: {
     marginTop: theme.spacing(1),
   },
@@ -315,7 +315,7 @@ export default function ShiftDialog(props: any) {
           <FormHelperText>Selecione por quantas vezes repetir a escala</FormHelperText>
         </FormControl>
       </Container>
-      <Snackbar open={snack} autoHideDuration={3000} onClose={closeSnack} >
+      <Snackbar open={snack} autoHideDuration={1000} onClose={closeSnack} >
         {shiftSuccess
           ? <Alert severity="success">{message}</Alert>
           : <Alert severity="error" >{message}</Alert>

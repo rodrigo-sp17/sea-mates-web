@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Alert from 'view/components/Alert';
-import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Typography, Container, makeStyles } from '@material-ui/core';
+import { Snackbar, Checkbox, Fab, Grid, List, ListItem, ListItemIcon, ListItemText, Container, makeStyles } from '@material-ui/core';
 import { Add, Delete } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import Shift from 'api/data/shift';
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
   fab: {
     position: 'fixed',
-    left: 'auto', 
+    left: 'auto',
     right: 20,
     bottom: 20,
     zIndex: 100
@@ -24,13 +24,13 @@ const useStyles = makeStyles((theme) => ({
 export default function Shifts(props: any) {
   const { changeTitle } = props;
   const classes = useStyles();
-  const { deleteShift } = useShiftModel();
-  
+  const { reloadShifts, deleteShift } = useShiftModel();
+
   // Shift selection state (through checkbox)
   const shifts = useRecoilValue(shiftListState);
   const [checked, setChecked] = useRecoilState(checkedShiftState);
   const [showDeleteFab, setShowDeleteFab] = useState(false);
-  
+
   // Snack state
   const [snack, showSnack] = useState(false);
   const [shiftSuccess, setSuccess] = useState(false);
@@ -40,13 +40,16 @@ export default function Shifts(props: any) {
   useEffect(() => {
     changeTitle("Escalas");
   }, [changeTitle])
-  
-  
-  const deleteShifts = () => {
+
+  useEffect(() => {
+    reloadShifts();
+  }, []);
+
+  const deleteShifts = async () => {
     var deleted = 0;
     var successful = true;
 
-    checked.forEach(async (id) => {
+    for (let id of checked) {
       let errorMsg = await deleteShift(id);
       if (errorMsg) {
         setMessage(errorMsg);
@@ -55,11 +58,13 @@ export default function Shifts(props: any) {
       } else {
         deleted++;
       }
-    });
+    }
 
     if (successful) {
       setSuccess(true);
       setMessage(`Deletadas ${deleted} escalas!`);
+      setShowDeleteFab(false);
+      setChecked(new Set());
     } else {
       setSuccess(false);
     }
@@ -70,7 +75,7 @@ export default function Shifts(props: any) {
   // Handles the toggling of list items
   const handleToggle = (shiftId: number) => () => {
     const isSelected = checked.has(shiftId);
-    const oldChecked = checked;
+    const oldChecked = new Set(checked);
     if (isSelected) {
       oldChecked.delete(shiftId);
     } else {
@@ -89,42 +94,37 @@ export default function Shifts(props: any) {
 
   return (
     <Container disableGutters className={classes.root}>
-      <Grid container justify="center">
-        <List>
-          {shifts.map((shift: Shift) => (
-            <ListItem 
-              key={shift.shiftId} 
-              button 
-              onClick={handleToggle(shift.shiftId)}
-            >
-              <ListItemIcon>
-                <Checkbox
-                  edge="start"
-                  checked={checked.has(shift.shiftId)}
-                  tabIndex={-1}
-                  disableRipple
-                />
-              </ListItemIcon>
-              <ListItemAvatar>
-                <Typography variant="h6">
-                  {shift.shiftId}
-                </Typography>
-              </ListItemAvatar>
-              <ListItemText 
-                primary={`De ${shift.unavailabilityStartDate} até ${shift.unavailabilityEndDate}`}
-              />                        
-            </ListItem>
-          ))}
-        </List>
-      </Grid>
+      <List disablePadding>
+        {shifts.map((shift: Shift) => (
+          <ListItem
+            divider
+            key={shift.shiftId}
+            button
+            onClick={handleToggle(shift.shiftId)}
+            selected={checked.has(shift.shiftId)}
+          >
+            <ListItemIcon>
+              <Checkbox
+                edge="start"
+                checked={checked.has(shift.shiftId)}
+                tabIndex={-1}
+                disableRipple
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary={`${shift.unavailabilityStartDate} --> ${shift.unavailabilityEndDate}`}
+            />
+          </ListItem>
+        ))}
+      </List>
       <Grid container justify="flex-end" className={classes.fab}>
-        {showDeleteFab 
-        ? <Fab color="secondary" aria-label="delete" onClick={deleteShifts} children={<Delete />}/>
-        : <Fab color="primary" aria-label="add" component={Link} to="/shift" children={<Add />} />            
+        {showDeleteFab
+          ? <Fab color="secondary" aria-label="delete" onClick={deleteShifts} children={<Delete />} />
+          : <Fab color="primary" aria-label="add" component={Link} to="/shift" children={<Add />} />
         }
       </Grid>
       <Grid>
-        <Snackbar open={snack} autoHideDuration={4000} onClose={() => showSnack(false)} >
+        <Snackbar open={snack} autoHideDuration={2000} onClose={() => showSnack(false)} >
           {shiftSuccess
             ? <Alert severity="success">{message}</Alert>
             : <Alert severity="error" >{message}</Alert>
