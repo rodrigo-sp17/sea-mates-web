@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AppBar, Container, Dialog, DialogContent, Divider, Grid, IconButton, List, ListItem, ListItemText, ListSubheader, Toolbar, Typography } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
@@ -6,8 +6,9 @@ import { availableFriendsQuery } from 'api/model/friend_model';
 import { TransitionProps } from '@material-ui/core/transitions';
 import { Slide } from '@material-ui/core';
 import { Close } from '@material-ui/icons';
-import User from 'api/data/user';
 import CenterLoadingScreen from 'view/components/CenterLoadingScreen';
+import FriendProfileDialog from 'view/friends/FriendProfileDialog';
+import Friend from 'api/data/friend';
 
 EventDialog.propTypes = {
   date: PropTypes.string.isRequired,
@@ -24,6 +25,17 @@ const Transition = forwardRef(function Transition(
 
 function FriendList({ date }: any) {
   const friends = useRecoilValue(availableFriendsQuery(date));
+  const [open, setOpen] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<Friend>(new Friend());
+
+  const handleClick = (friend: Friend) => () => {
+    setSelectedFriend(friend);
+    setOpen(true);
+  }
+
+  const onClose = () => {
+    setOpen(false);
+  }
 
   return (
     <React.Suspense fallback={<CenterLoadingScreen />}>
@@ -31,11 +43,17 @@ function FriendList({ date }: any) {
         ? <Grid xs container justify="center" alignItems="center">
           <Typography variant="body2">Nenhum amigo disponível</Typography>
         </Grid>
-        : friends.map((friend: User) => (
-          <ListItem divider alignItems="flex-start" key={friend.userId}>
-            <ListItemText primary={friend.name} secondary={`${friend.username}\n${friend.email}`} />
+        : friends.map((friend: Friend) => (
+          <ListItem button onClick={handleClick(friend)} divider alignItems="flex-start" key={friend.userId}>
+            <ListItemText primary={friend.name} secondary={
+              <div>
+                <div>{friend.username}</div>
+                <div>{friend.email}</div>
+              </div>
+            } />
           </ListItem>
         ))}
+      <FriendProfileDialog open={open} friend={selectedFriend} onClose={onClose} />
     </React.Suspense>
   )
 }

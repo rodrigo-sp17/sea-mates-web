@@ -1,6 +1,5 @@
 import Friend from "api/data/friend";
 import FriendRequest from "api/data/friend_request";
-import User from "api/data/user";
 import BadRequestError from "api/errors/bad_request_error";
 import ForbiddenError from "api/errors/forbidden_error";
 import NotFoundError from "api/errors/not_found_error";
@@ -8,7 +7,7 @@ import ServerError from "api/errors/server_error";
 
 export default class FriendClient {
 
-  static async getAvailableFriends(date: Date, bearerToken: string): Promise<Array<User>> {
+  static async getAvailableFriends(date: Date, bearerToken: string): Promise<Array<Friend>> {
     let friendsListJson = await fetch("/api/calendar/available?date=" + date.toISOString().substr(0, 10), {
       method: 'GET',
       headers: {
@@ -36,7 +35,7 @@ export default class FriendClient {
       );
 
     if (friendsListJson == null) {
-      return new Array<User>();
+      return new Array<Friend>();
     }
 
     return FriendClient.parseFriendListJson(friendsListJson);

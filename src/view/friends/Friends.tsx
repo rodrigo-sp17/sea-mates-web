@@ -10,6 +10,7 @@ import { friendListState, requestListState, useFriendModel } from 'api/model/fri
 import { useRecoilValue } from 'recoil';
 import FriendRequest from 'api/data/friend_request';
 import Friend from 'api/data/friend';
+import FriendProfileDialog from './FriendProfileDialog';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,6 +59,17 @@ export default function Friends(props: any) {
     loadAll();
   }, []);
 
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState(new Friend());
+  const handleFriendClick = (friend: Friend) => () => {
+    setSelectedFriend(friend);
+    setProfileOpen(true);
+  }
+
+  const handleProfileClose = () => {
+    setProfileOpen(false);
+  }
+
   const handleRequestFriendship = async (username: string) => {
     setOpen({ ...open, requestDialog: false });
     if (username == null || username === "") return;
@@ -88,7 +100,6 @@ export default function Friends(props: any) {
   }
 
   const handleUnfriend = () => {
-    console.log('toggled');
     setOpen({ ...open, deleteDialog: true });
   }
 
@@ -163,7 +174,13 @@ export default function Friends(props: any) {
       <Divider />
       <List subheader={<ListSubheader>Amizades</ListSubheader>} className={classes.list}>
         {friends.map((friend: Friend) => (
-          <ListItem divider alignItems="center" disableGutters button key={friend.userId}>
+          <ListItem divider 
+          alignItems="center" 
+          disableGutters 
+          button 
+          key={friend.userId}
+          onClick={handleFriendClick(friend)  }
+          >
             <ListItemIcon>
               {isAvailableNow(friend.shifts)
                 ? <DirectionsBoat />
@@ -214,6 +231,7 @@ export default function Friends(props: any) {
         </Snackbar>
       </Grid>
       <RequestDialog onClose={handleRequestFriendship} open={open.requestDialog} />
+      <FriendProfileDialog onClose={handleProfileClose} open={profileOpen} friend={selectedFriend} />
     </Container>
   );
 }
