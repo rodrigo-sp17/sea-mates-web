@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import clsx from 'clsx';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,10 +7,8 @@ import AppBar from '@material-ui/core/AppBar';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import Drawer from '@material-ui/core/Drawer';
-import { Divider, Hidden, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem } from '@material-ui/core';
+import { Divider, Hidden, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { AccountCircle, CalendarToday, DateRange, ExitToApp, People } from '@material-ui/icons';
 
 import Calendar from 'view/calendar/Calendar';
@@ -19,9 +17,9 @@ import Shifts from 'view/shifts/Shifts';
 import Friends from 'view/friends/Friends';
 import Account from 'view/account/Account';
 
-import { EventSourcePolyfill } from 'event-source-polyfill';
 import { useUserModel } from 'api/model/user_model';
 import CenterLoadingScreen from './components/CenterLoadingScreen';
+import NotificationService from './components/NotificationService';
 
 
 const drawerWidth = 240;
@@ -70,6 +68,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+
 export default function Home() {
   const classes = useStyles();
   const [title, setTitle] = useState("Minha Escala");
@@ -82,13 +82,6 @@ export default function Home() {
   // Drawer state
   const [open, setOpen] = useState(false);
 
-  // Menu state
-  const [notifAnchorEl, setNotifAnchorEl] = useState<Element | null>(null);
-
-  // Notifications state
-  const [notifications, setNotifications] = useState<string[]>([]);
-  const [newNotifications, setNewNotifications] = useState(0);
-
   // Helper functions
   const changeTitle = (newTitle: string) => {
     setTitle(newTitle);
@@ -96,67 +89,11 @@ export default function Home() {
 
   const handleLogout = () => {
     logout();
-    handleMenuClose();
   }
-
-  const subscribePush = () => {
-    const username = sessionStorage.getItem('loggedUsername');
-    const token = sessionStorage.getItem('token');
-    var es = new EventSourcePolyfill(
-      '/api/push/subscribe/' + username,
-      {
-        headers: {
-          "Authorization": token,
-        }
-      }
-    );
-
-    es.onerror = () => es.close();
-    es.addEventListener("FRIEND_REQUEST", (e: any) => handleFriendRequestEvent(e));
-    es.addEventListener("FRIEND_ACCEPT", (e: any) => handleFriendAcceptEvent(e));
-  }
-
-  const handleFriendRequestEvent = function (event: any) {
-    const username = sessionStorage.getItem("loggedUsername");
-    const data = JSON.parse(event.data);
-    const source = data.source;
-    if (source !== username) {
-      var note = `${source} solicitou sua amizade!`;
-      var newNotifs = notifications.concat(note);
-      setNotifications(newNotifs);
-      setNewNotifications(newNotifications + 1);
-    }
-  }
-
-  const handleFriendAcceptEvent = function (event: any) {
-    const username = sessionStorage.getItem("loggedUsername");
-    const data = JSON.parse(event.data);
-    const source = data.source;
-    if (source !== username) {
-      var note = `${source} aceitou sua solicitação!`;
-      var newNotifs = notifications.concat(note);
-      setNotifications(newNotifs);
-      setNewNotifications(newNotifications + 1);
-    }
-  }
-
-  useEffect(() => {
-    subscribePush();
-  }, []);
 
   // Drawer handler
   const toggleDrawer = (open: boolean) => (event: SyntheticEvent) => {
     setOpen(open);
-  }
-
-  // Menu handlers
-  const handleNotifMenuOpen = (event: SyntheticEvent) => {
-    setNotifAnchorEl(event.currentTarget);
-    setNewNotifications(0);
-  }
-
-  const handleMenuClose = () => {
-    setNotifAnchorEl(null);
   }
 
   const drawer = (
@@ -229,23 +166,7 @@ export default function Home() {
           <Typography variant="h6" className={classes.title}>
             {title}
           </Typography>
-          <IconButton onClick={handleNotifMenuOpen} color="inherit">
-            <Badge
-              badgeContent={newNotifications}
-              color="error"
-            >
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Menu
-            id="menu-notifications"
-            anchorEl={notifAnchorEl}
-            keepMounted
-            open={Boolean(notifAnchorEl)}
-            onClose={handleMenuClose}
-          >
-            {notifications.map((notif, index) => <MenuItem key={index}>{notif}</MenuItem>)}
-          </Menu>
+          <NotificationService />
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer}>
