@@ -27,6 +27,7 @@ export default function Shifts(props: any) {
   const { reloadShifts, deleteShift } = useShiftModel();
 
   // Shift selection state (through checkbox)
+  const [isDeleting, setDeleting] = useState(false);
   const shifts = useRecoilValue(shiftListState);
   const [checked, setChecked] = useRecoilState(checkedShiftState);
   const [showDeleteFab, setShowDeleteFab] = useState(false);
@@ -46,6 +47,9 @@ export default function Shifts(props: any) {
   }, []);
 
   const deleteShifts = async () => {
+    if (isDeleting) return;
+    setDeleting(true);
+
     var deleted = 0;
     var successful = true;
 
@@ -68,6 +72,7 @@ export default function Shifts(props: any) {
     } else {
       setSuccess(false);
     }
+    setDeleting(false);
     showSnack(true);
   };
 
