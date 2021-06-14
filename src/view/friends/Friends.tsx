@@ -42,6 +42,7 @@ export default function Friends(props: any) {
   });
 
   // Friends state
+  const [isSubmitting, setSubmitting] = useState(false);
   const { myRequests, otherRequests } = useRecoilValue(requestListState);
   const friends = useRecoilValue(friendListState);
   const [selectedFriend, setSelectedFriend] = useState(new Friend());
@@ -93,6 +94,7 @@ export default function Friends(props: any) {
   const handleAcceptFriend = (username: string) => async () => {
     if (username == null || username === "") return;
 
+    setSubmitting(true);
     const errorMsg = await acceptFriendship(username);
     if (errorMsg) {
       setMessage(errorMsg);
@@ -101,6 +103,7 @@ export default function Friends(props: any) {
       setMessage("Amizade aceita!");
       setSuccess(true);
     }
+    setSubmitting(false);
     showSnack(true);
   }
 
@@ -114,6 +117,7 @@ export default function Friends(props: any) {
     setOpen({ ...open, deleteDialog: false });
     if (username == null || username === "") return;
 
+    setSubmitting(true);
     const errorMsg = await unfriend(username);
     if (errorMsg) {
       setMessage(errorMsg);
@@ -122,6 +126,7 @@ export default function Friends(props: any) {
       setMessage(`Amizade desfeita com ${username}!`);
       setSuccess(true);
     }
+    setSubmitting(false);
     showSnack(true);
   }
 
@@ -157,7 +162,7 @@ export default function Friends(props: any) {
                 }
               />
               <ListItemSecondaryAction>
-                <IconButton color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
+                <IconButton disabled={isSubmitting} color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
                   <PersonAdd />
                 </IconButton>
               </ListItemSecondaryAction>
@@ -205,8 +210,8 @@ export default function Friends(props: any) {
                 </div>
               }
             />
-            <ListItemSecondaryAction >
-              <IconButton onClick={handleUnfriendClick(friend)}>
+            <ListItemSecondaryAction>
+              <IconButton disabled={isSubmitting} onClick={handleUnfriendClick(friend)}>
                 <Delete color="error" />
               </IconButton>
             </ListItemSecondaryAction>
