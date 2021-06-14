@@ -1,16 +1,26 @@
 import { userState } from "api/model/user_model";
 import React, { useState, useEffect, SyntheticEvent } from "react";
-import { useRecoilValue } from "recoil";
+import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { IconButton, Badge, Menu, MenuItem } from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NotificationEvent from "api/data/notification_event";
 import { useHistory } from "react-router-dom";
 
+const notificationsState = atom<Array<NotificationEvent>>({
+  key: 'Notifications',
+  default: []
+});
+
+const newNotificationsState = atom<number>({
+  key: "NewNotifications",
+  default: 0
+});
+
 export default function NotificationService() {
   const history = useHistory();
-  const [notifs, setNotifs] = useState<Array<NotificationEvent>>([]);
-  const [newNotifs, setNewNotifs] = useState(0);
+  const [notifs, setNotifs] = useRecoilState<Array<NotificationEvent>>(notificationsState);
+  const [newNotifs, setNewNotifs] = useRecoilState<number>(newNotificationsState);
   const [anchor, setAnchor] = useState<Element | null>(null);
   const user = useRecoilValue(userState)
 
@@ -34,6 +44,7 @@ export default function NotificationService() {
     subscribePush();
   }, []);
 
+
   const handleFriendRequestEvent = function (event: any) {
     const username = user.username;
     const data = JSON.parse(event.data);
@@ -45,7 +56,7 @@ export default function NotificationService() {
   }
 
   const handleFriendAcceptEvent = function (event: any) {
-    const username = sessionStorage.getItem("loggedUsername");
+    const username = user.username;
     const data = JSON.parse(event.data);
     const source = data.source;
     if (source !== username) {
@@ -55,9 +66,10 @@ export default function NotificationService() {
   }
 
   const addNotifs = (notif: NotificationEvent) => {
-    var updatedNotifs = notifs.concat(notif);
-    setNotifs(updatedNotifs)
-    setNewNotifs(newNotifs + 1);
+    console.log('Notif: ' + notif);
+    setNotifs((currNotifs) => [notif].concat(currNotifs));
+    console.log('Notifs: ' + notifs);
+    setNewNotifs((currNews) => currNews + 1);
   }
 
   const redirectCallback = (notifType: string) => {
