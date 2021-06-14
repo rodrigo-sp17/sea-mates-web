@@ -8,7 +8,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Container from '@material-ui/core/Container';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
-import { Snackbar, Button, Grid, FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField, FormControlLabel, Switch, Dialog, Slide } from '@material-ui/core';
+import { Snackbar, Button, Grid, FormControl, InputLabel, Select, MenuItem, FormHelperText, TextField, FormControlLabel, Switch, Dialog, Slide, CircularProgress } from '@material-ui/core';
 import { Close, Save } from '@material-ui/icons';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
@@ -67,6 +67,7 @@ export default function ShiftDialog(props: any) {
     dateLeaving: null,
     dateAvailable: null
   });
+  const [isSubmitting, setSubmitting] = useState(false);
 
   // Handlers
   const handleUnavailableDate = (date: Date | null) => {
@@ -141,7 +142,10 @@ export default function ShiftDialog(props: any) {
 
   const submit = async (event: any) => {
     event.preventDefault();
+    if (isSubmitting) return;
+    
     if (validate()) {
+      setSubmitting(true);
       let errorMsg = await addShift(shift);
       if (errorMsg) {
         setMessage(errorMsg);
@@ -151,6 +155,7 @@ export default function ShiftDialog(props: any) {
         setSuccess(true);
       }
       showSnack(true);
+      setSubmitting(false);
     }
   };
 
@@ -209,9 +214,10 @@ export default function ShiftDialog(props: any) {
           <Typography variant="h6" className={classes.title} >
             Adicionar Escala
           </Typography>
+          {isSubmitting ? <CircularProgress /> :
           <Button color="inherit" startIcon={<Save />} onClick={submit}>
             Salvar
-          </Button>
+          </Button>}
         </Toolbar>
       </AppBar>
       <Container maxWidth="lg" className={classes.form} >
