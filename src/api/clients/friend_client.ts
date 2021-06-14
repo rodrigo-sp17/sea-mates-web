@@ -1,5 +1,6 @@
 import Friend from "api/data/friend";
 import FriendRequest from "api/data/friend_request";
+import Shift from "api/data/shift";
 import BadRequestError from "api/errors/bad_request_error";
 import ForbiddenError from "api/errors/forbidden_error";
 import NotFoundError from "api/errors/not_found_error";
@@ -201,8 +202,14 @@ export default class FriendClient {
       friend.username = f.userInfo.username;
       friend.userId = f.userId;
       friend.email = f.userInfo.email;
-      friend.shifts = f.shifts;
+      friend.shifts = this.parseShiftsListJson(f.shifts);
       return friend;
+    });
+  }
+
+  static parseShiftsListJson(shiftListJson: any): Array<Shift> {
+    return shiftListJson.map((obj: any) => {
+      return Shift.parseJson(obj);
     });
   }
 

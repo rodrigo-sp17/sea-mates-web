@@ -59,7 +59,7 @@ export default function ShiftDialog(props: any) {
   const [shiftSuccess, setSuccess] = useState(false);
 
   // Shift state
-  const [shift, setShift] = useState<Shift>(new Shift());
+  const [shift, setShift] = useState<any>(new Shift());
   const [useCycle, setUseCycle] = useState(false);
   const [errors, setErrors] = useState<any>({
     dateUnavailable: null,

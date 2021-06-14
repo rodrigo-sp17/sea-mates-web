@@ -71,7 +71,7 @@ export default function FriendProfileDialog({ open, friend, onClose }: Props) {
                 divider
                 key={shift.shiftId}>
                 <ListItemText
-                  primary={`${shift.unavailabilityStartDate} --> ${shift.unavailabilityEndDate}`}
+                  primary={`${shift.unavailabilityStartDate.toLocaleDateString("pt-br")} --> ${shift.unavailabilityEndDate.toLocaleDateString("pt-br")}`}
                 />
               </ListItem>
             )}

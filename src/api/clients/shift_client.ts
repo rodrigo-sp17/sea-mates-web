@@ -20,7 +20,7 @@ export default class ShiftClient {
           if (newShifts === undefined) {
             return new Array<Shift>();
           } else {
-            return newShifts.shiftList;
+            return this.parseShiftsJson(newShifts.shiftList);
           }
         } else if (res.status === 403) {
           throw new ForbiddenError('Forbidden');
@@ -91,5 +91,14 @@ export default class ShiftClient {
         throw new Error("Error deleting shifts: " + err.message);
       }
     );
+  }
+
+  static parseShiftsJson(shiftsJson: any): Array<Shift> {
+    var resList = new Array<Shift>();
+    for (let obj of shiftsJson) {
+      var shift = Shift.parseJson(obj);
+      resList.push(shift);
+    }
+    return resList;
   }
 }

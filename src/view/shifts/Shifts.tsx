@@ -112,7 +112,7 @@ export default function Shifts(props: any) {
               />
             </ListItemIcon>
             <ListItemText
-              primary={`${shift.unavailabilityStartDate} --> ${shift.unavailabilityEndDate}`}
+              primary={`${shift.unavailabilityStartDate.toLocaleDateString("pt-br")} --> ${shift.unavailabilityEndDate.toLocaleDateString("pt-br")}`}
             />
           </ListItem>
         ))}

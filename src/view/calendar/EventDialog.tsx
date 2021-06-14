@@ -74,7 +74,7 @@ export default function EventDialog(props: any) {
             <Close />
           </IconButton>
           <Typography variant="h6">
-            {`Dia ${parsedDate.toLocaleDateString()}`}
+            {`Dia ${parsedDate.toLocaleDateString("pt-br")}`}
           </Typography>
         </Toolbar>
       </AppBar>

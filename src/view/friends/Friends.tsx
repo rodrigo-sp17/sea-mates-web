@@ -127,11 +127,15 @@ export default function Friends(props: any) {
 
   // Returns true if today is outside the shifts, or false if it is inside
   const isAvailableNow = (shifts: Shift[]) => {
-    const now = Date.now();
+    const now = new Date();
     return shifts.every((shift) => {
       const startDate = shift.unavailabilityStartDate;
       const endDate = shift.unavailabilityEndDate;
-
+      console.log(now);
+      const isBef = isBefore(now, startDate);
+      const isAft = isAfter(endDate, now);
+      console.log(isBef);
+      console.log(isAft);
       return isBefore(now, startDate) || isAfter(now, endDate);
     })
   }
@@ -148,7 +152,7 @@ export default function Friends(props: any) {
                 secondary={
                   <div>
                     <div>{request.sourceUsername}</div>
-                    <div>Requisitado em {request.timestamp.toLocaleString()}</div>
+                    <div>Requisitado em {request.timestamp.toLocaleString("pt-br")}</div>
                   </div>
                 }
               />
@@ -169,7 +173,7 @@ export default function Friends(props: any) {
               primary={request.targetName}
               secondary={<div>
                 <div>{request.targetUsername}</div>
-                <div>Requisitado em {request.timestamp.toLocaleString()}</div>
+                <div>Requisitado em {request.timestamp.toLocaleString("pt-br")}</div>
               </div>}
             />
 
