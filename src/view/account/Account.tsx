@@ -37,7 +37,6 @@ export default function Account(props: any) {
   const classes = useStyles();
   const history = useHistory();
 
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isDeleting, setDeleting] = useState(false);
 
@@ -65,7 +64,9 @@ export default function Account(props: any) {
       var newUser = new User();
       newUser.userId = originalUser.userId;
       newUser.name = newValues.name;
-      newUser.email = newValues.email;
+      // Required since the server expects null where no editions are required      
+      const newEmail = newValues.email;
+      newUser.email = newEmail === originalUser.email ? null : newEmail;
 
       var errorMsg = await editUser(newUser);
       if (errorMsg) {
@@ -78,7 +79,6 @@ export default function Account(props: any) {
       showSnack(true);
     }
     setSubmitting(false);
-    setIsLoaded(false);
     setOpen({ ...open, editDialog: false });
   }
 
