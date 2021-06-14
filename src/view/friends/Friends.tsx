@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Snackbar, Button, Dialog, DialogActions, DialogTitle, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, ListSubheader, ListItemSecondaryAction, Container } from '@material-ui/core';
+import { Snackbar, Fab, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider, ListSubheader, ListItemSecondaryAction, Container } from '@material-ui/core';
 import { Add, Delete, DirectionsBoat, Home, HourglassEmpty, PersonAdd, PriorityHigh } from '@material-ui/icons';
 import Alert from '../components/Alert';
 import RequestDialog from './RequestDialog';
@@ -11,6 +11,7 @@ import { useRecoilValue } from 'recoil';
 import FriendRequest from 'api/data/friend_request';
 import Friend from 'api/data/friend';
 import FriendProfileDialog from './FriendProfileDialog';
+import DeleteDialog from './DeleteDialog';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,13 +38,13 @@ export default function Friends(props: any) {
   const [open, setOpen] = useState({
     requestDialog: false,
     deleteDialog: false,
+    profileDialog: false,
   });
 
   // Friends state
-  //const myRequests = useRecoilValue(myRequestListState);
-  //const otherRequests = useRecoilValue(otherRequestListState);
   const { myRequests, otherRequests } = useRecoilValue(requestListState);
   const friends = useRecoilValue(friendListState);
+  const [selectedFriend, setSelectedFriend] = useState(new Friend());
 
   // Snack state
   const [snack, showSnack] = useState(false);
@@ -59,18 +60,21 @@ export default function Friends(props: any) {
     loadAll();
   }, []);
 
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [selectedFriend, setSelectedFriend] = useState(new Friend());
-  const handleFriendClick = (friend: Friend) => () => {
+  const handleProfileClick = (friend: Friend) => () => {
     setSelectedFriend(friend);
-    setProfileOpen(true);
+    setOpen({ ...open, profileDialog: true });
   }
 
   const handleProfileClose = () => {
-    setProfileOpen(false);
+    setOpen({ ...open, profileDialog: false });
   }
 
-  const handleRequestFriendship = async (username: string) => {
+
+  const handleRequestClick = () => {
+    setOpen({ ...open, requestDialog: true });
+  }
+
+  const handleRequestClose = async (username: string | null) => {
     setOpen({ ...open, requestDialog: false });
     if (username == null || username === "") return;
 
@@ -84,6 +88,7 @@ export default function Friends(props: any) {
     }
     showSnack(true);
   }
+
 
   const handleAcceptFriend = (username: string) => async () => {
     if (username == null || username === "") return;
@@ -99,11 +104,14 @@ export default function Friends(props: any) {
     showSnack(true);
   }
 
-  const handleUnfriend = () => {
+  
+  const handleUnfriendClick = (friend: Friend) => () => {
+    setSelectedFriend(friend);
     setOpen({ ...open, deleteDialog: true });
   }
 
-  const doUnfriend = (username: string) => async () => {
+  const handleUnfriendClose = async (username: string | null) => {
+    setOpen({ ...open, deleteDialog: false });
     if (username == null || username === "") return;
 
     const errorMsg = await unfriend(username);
@@ -115,11 +123,6 @@ export default function Friends(props: any) {
       setSuccess(true);
     }
     showSnack(true);
-    setOpen({ ...open, deleteDialog: false });
-  }
-
-  const toggleDialog = (dialog: any, open: any) => (event: any) => {
-    setOpen({ ...open, [dialog]: open });
   }
 
   // Returns true if today is outside the shifts, or false if it is inside
@@ -149,9 +152,11 @@ export default function Friends(props: any) {
                   </div>
                 }
               />
-              <IconButton color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
-                <PersonAdd />
-              </IconButton>
+              <ListItemSecondaryAction>
+                <IconButton color="primary" onClick={handleAcceptFriend(request.sourceUsername)}>
+                  <PersonAdd />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           )
         })}
@@ -174,12 +179,12 @@ export default function Friends(props: any) {
       <Divider />
       <List subheader={<ListSubheader>Amizades</ListSubheader>} className={classes.list}>
         {friends.map((friend: Friend) => (
-          <ListItem divider 
-          alignItems="center" 
-          disableGutters 
-          button 
-          key={friend.userId}
-          onClick={handleFriendClick(friend)  }
+          <ListItem divider
+            alignItems="center"
+            disableGutters
+            button
+            key={friend.userId}
+            onClick={handleProfileClick(friend)}
           >
             <ListItemIcon>
               {isAvailableNow(friend.shifts)
@@ -196,29 +201,16 @@ export default function Friends(props: any) {
                 </div>
               }
             />
-            <ListItemSecondaryAction>
-              <IconButton onClick={handleUnfriend}>
+            <ListItemSecondaryAction >
+              <IconButton onClick={handleUnfriendClick(friend)}>
                 <Delete color="error" />
               </IconButton>
             </ListItemSecondaryAction>
-            <Dialog open={open['deleteDialog']}>
-              <DialogTitle>
-                Deseja desfazer a amizade?
-              </DialogTitle>
-              <DialogActions>
-                <Button color="primary" onClick={toggleDialog('deleteDialog', false)}>
-                  Cancelar
-                </Button>
-                <Button autoFocus color="primary" onClick={doUnfriend(friend.username)}>
-                  Aceitar
-                </Button>
-              </DialogActions>
-            </Dialog>
           </ListItem>
         ))}
       </List>
       <Grid container justify="flex-end" className={classes.fab}>
-        <Fab color="primary" aria-label="add" onClick={toggleDialog('requestDialog', true)}>
+        <Fab color="primary" aria-label="add" onClick={handleRequestClick}>
           <Add />
         </Fab>
       </Grid>
@@ -230,8 +222,9 @@ export default function Friends(props: any) {
           }
         </Snackbar>
       </Grid>
-      <RequestDialog onClose={handleRequestFriendship} open={open.requestDialog} />
-      <FriendProfileDialog onClose={handleProfileClose} open={profileOpen} friend={selectedFriend} />
+      <RequestDialog onClose={handleRequestClose} open={open.requestDialog} />
+      <DeleteDialog onClose={handleUnfriendClose} open={open.deleteDialog} friend={selectedFriend} />
+      <FriendProfileDialog onClose={handleProfileClose} open={open.profileDialog} friend={selectedFriend} />
     </Container>
   );
 }

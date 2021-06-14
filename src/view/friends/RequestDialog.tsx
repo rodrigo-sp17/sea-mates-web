@@ -1,11 +1,15 @@
-import React,{ useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField } from '@material-ui/core';
 
-export default function RequestDialog(props: any) {
+interface Props {
+  open: boolean,
+  onClose: (username: string | null) => void
+}
+
+export default function RequestDialog(props: Props) {
   const { onClose, open } = props;
   const [username, setUsername] = useState("");
-  
+
   const submit = () => {
     onClose(username);
   }
@@ -45,8 +49,3 @@ export default function RequestDialog(props: any) {
     </Grid>
   );
 }
-
-RequestDialog.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-};
