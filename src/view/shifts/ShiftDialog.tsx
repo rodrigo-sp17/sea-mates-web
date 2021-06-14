@@ -59,7 +59,7 @@ export default function ShiftDialog(props: any) {
   const [shiftSuccess, setSuccess] = useState(false);
 
   // Shift state
-  const [shift, setShift] = useState<any>(new Shift());
+  const [shift, setShift] = useState(new Shift());
   const [useCycle, setUseCycle] = useState(false);
   const [errors, setErrors] = useState<any>({
     dateUnavailable: null,
@@ -77,21 +77,31 @@ export default function ShiftDialog(props: any) {
   const handleBoardingDate = (date: Date | null) => {
     if (date == null) return;
 
+    var newUnStartDate = shift.unavailabilityStartDate;
+    if (isBefore(date, newUnStartDate)) {
+      newUnStartDate = date;
+    }
+
     var newCycleDays = shift.cycleDays;
     if (!useCycle) {
       newCycleDays = differenceInCalendarDays(shift.leavingDate, date);
     }
-    setShift({ ...shift, boardingDate: date, cycleDays: newCycleDays });
+    setShift({ ...shift, unavailabilityStartDate: newUnStartDate, boardingDate: date, cycleDays: newCycleDays });
   }
 
   const handleLeavingDate = (date: Date | null) => {
     if (date == null) return;
 
+    var newUnEndDate = shift.unavailabilityEndDate;
+    if (isAfter(date, newUnEndDate)) {
+      newUnEndDate = date;
+    }
+
     var newCycleDays = shift.cycleDays;
     if (!useCycle) {
       newCycleDays = differenceInCalendarDays(date, shift.boardingDate);
     }
-    setShift({ ...shift, leavingDate: date, cycleDays: newCycleDays });
+    setShift({ ...shift, unavailabilityEndDate: newUnEndDate, leavingDate: date, cycleDays: newCycleDays });
   }
 
   const handleAvailableDate = (date: Date | null) => {
