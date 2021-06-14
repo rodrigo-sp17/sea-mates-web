@@ -132,7 +132,7 @@ export default function Friends(props: any) {
       const startDate = shift.unavailabilityStartDate;
       const endDate = shift.unavailabilityEndDate;
 
-      return isBefore(now, startDate) && isAfter(now, endDate);
+      return isBefore(now, startDate) || isAfter(now, endDate);
     })
   }
 
@@ -188,8 +188,8 @@ export default function Friends(props: any) {
           >
             <ListItemIcon>
               {isAvailableNow(friend.shifts)
-                ? <DirectionsBoat />
-                : <Home />
+                ? <Home />
+                : <DirectionsBoat />
               }
             </ListItemIcon>
             <ListItemText
