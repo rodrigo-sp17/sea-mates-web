@@ -35,8 +35,8 @@ export default function LoginSuccess() {
     const token = params.get('token');
 
     var fetchedUser = await UserClient.fetchUserInfo('Bearer ' + token);
+    setIsLoading(false);
     saveUser(fetchedUser);
-    setIsLoading(true);
   }
 
   const redirectHome = () => history.push("/");
