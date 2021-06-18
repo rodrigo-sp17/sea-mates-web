@@ -60,7 +60,7 @@ export default function PasswordReset() {
     var req = new UserRequest();
     req.username = formState.username;
     req.password = formState.password;
-    req.confirmPassword = formState.confirmPassword;
+    req.confirmPassword = formState.confirm;
     
     var errorMsg = await resetPassword(req, token);
     if (errorMsg) {
